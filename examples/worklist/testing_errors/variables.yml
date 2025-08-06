@@ -1,0 +1,7 @@
+interval: 1m
+url: http://localhost:8090
+api_key: xxxx
+page_size: 1
+data_path: data
+enable_request_tracer: false
+initial_interval: 24h

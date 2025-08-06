@@ -1,0 +1,298 @@
+rules:
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      page: 1
+      limit: 2
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"John Apple"
+               },
+               {
+                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
+                   "passenger_name":"Jane Artichoke"
+               }
+              ],
+           "links":{
+              "self":"http://localhost:8090/test/api/booking?page=1",
+              "next":"http://localhost:8090/test/api/booking?page=2"
+            }
+          }`
+          }}
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      page: 2
+      limit: 2
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"cd5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"George Doe"
+               },
+               {
+                  "id":"cd25ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Joan Doe"
+               }
+              ],
+           "links":{
+              "previous":"http://localhost:8090/test/api/booking?page=1",
+              "self":"http://localhost:8090/test/api/booking?page=2",
+              "next":"http://localhost:8090/test/api/booking?page=3"
+            }
+          }`
+          }}
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      page: 3
+      limit: 2
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"ef5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"James Effort"
+               },
+               {
+                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Jenny Ergo"
+               }
+              ],
+           "links":{
+              "previous":"http://localhost:8090/test/api/booking?page=2",
+              "self":"http://localhost:8090/test/api/booking?page=3"
+            }
+          }`
+          }}
+
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      page: 1
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"John Apple"
+               }
+              ],
+           "links":{
+              "self":"http://localhost:8090/test/api/booking?page=1",
+              "next":"http://localhost:8090/test/api/booking?page=2"
+            }          
+          }`
+          }}
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      page: 2
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+               {
+                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
+                   "passenger_name":"Jane Artichoke"
+               }
+              ],
+           "links":{
+              "previous":"http://localhost:8090/test/api/booking?page=1",
+              "self":"http://localhost:8090/test/api/booking?page=2",
+              "next":"http://localhost:8090/test/api/booking?page=3"
+            }
+          }`
+          }}
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      page: 3
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"cd5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"George Doe"
+               }
+              ],
+           "links":{
+              "previous":"http://localhost:8090/test/api/booking?page=2",
+              "self":"http://localhost:8090/test/api/booking?page=3",
+              "next":"http://localhost:8090/test/api/booking?page=4"
+            }
+          }`
+          }}
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      page: 4
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+               {
+                  "id":"cd25ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Joan Doe"
+               }
+              ],
+           "links":{
+              "previous":"http://localhost:8090/test/api/booking?page=3",
+              "self":"http://localhost:8090/test/api/booking?page=4",
+              "next":"http://localhost:8090/test/api/booking?page=5"
+            }          
+          }`
+          }}
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      page: 5
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"ef5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"James Effort"
+               }
+              ],
+           "links":{
+              "previous":"http://localhost:8090/test/api/booking?page=4",
+              "self":"http://localhost:8090/test/api/booking?page=5",
+              "next":"http://localhost:8090/test/api/booking?page=6"
+            }          
+          }`
+          }}
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      page: 6
+      limit: 1
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+               {
+                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Jenny Ergo"
+               }
+              ],
+           "links":{
+              "previous":"http://localhost:8090/test/api/booking?page=5",
+              "self":"http://localhost:8090/test/api/booking?page=6"
+            }          
+          }`
+          }}
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      limit: 2
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"John Apple"
+               },
+               {
+                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
+                   "passenger_name":"Jane Artichoke"
+               }
+              ],
+           "links":{
+              "self":"http://localhost:8090/test/api/booking?page=1",
+              "next":"http://localhost:8090/test/api/booking?page=2"
+            }
+          }`
+          }}
+  - path: /test/api/booking
+    methods: [GET]
+    query_params:
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcm5hbWU6YW1pcGFzc3dvcmQ="
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"John Apple"
+               }
+              ],
+           "links":{
+              "self":"http://localhost:8090/test/api/booking?page=1",
+              "next":"http://localhost:8090/test/api/booking?page=2"
+            }          
+          }`
+          }}

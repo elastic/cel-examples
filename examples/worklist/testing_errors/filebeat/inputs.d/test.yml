@@ -1,0 +1,153 @@
+- type: cel
+  enabled: true
+  id: test
+  config_version: 2
+  interval: 1m
+  resource.url: http://localhost:8090
+  state:
+    page_size: 1
+    offset: 0
+    initial_interval: 24h
+    api_key: xxxx
+  redact:
+    fields:
+      - api_key
+  # This program writes a set of message group ids into a worklist, then loops over the ids
+  # querying each message-group id to retrieve the list of messages for each group.
+  # When 'worklist' is empty, this triggers another API call to fill the worklist
+  # with more message-group ids. The pattern is a single call to the message-groups
+  # API followed by a multiple calls to the message API to retrieve messages.
+  # This example uses front() and tail() to pop values off the worklist
+  program: |-
+    (
+      // if the first api calls to message-group have filled 'worklist'
+      // return the state and skip calls to message-group API.
+      // When the first set of message-groups are worked off,
+      // 'worklist' will exist but will be empty, triggering another call
+      // to message-group API to retrieve more message-group ids.
+      (has(state.worklist) && size(state.worklist) > 0) ?
+        state
+      :
+        (
+          // 'want_more' is missing on initial call and false at the beginning of each periodic
+          // run. 'want_more' == false triggers initialization of time range parameters.
+          state.?want_more.orValue(false) ?
+            state
+          :
+            state.with(
+              {
+                "start_time": state.?cursor.last_timestamp.orValue((now - duration(state.initial_interval)).format(time_layout.RFC3339)),
+                "end_time": now.format(time_layout.RFC3339),
+              }
+            )
+        ).as(state,
+          state.with(
+            request(
+              "GET",
+              state.url.trim_right("/") + "/v0/message-groups?" + {
+                "created_at__gte": [state.start_time],
+                "created_at__lt": [state.end_time],
+                "flagged": ["true"],
+                "limit": [string(state.page_size)],
+                "offset": [string(state.offset)],
+              }.format_query()
+            ).with(
+              {
+                "Header": {
+                  "Authorization": ["Bearer " + state.api_key],
+                },
+              }
+            ).do_request().as(resp, (resp.StatusCode == 200) ?
+              bytes(resp.Body).decode_json().as(body,
+                {
+                  "worklist": (size(body.message_groups) > 0) ?
+                    body.message_groups.map(group,
+                      (has(group.messages) && size(group.messages) > 0) ? group.messages.map(e, e.id) : []
+                    ).flatten()
+                  :
+                    [],
+                }
+              )
+            :
+              {
+                "events": {
+                  "error": {
+                    "code": string(resp.StatusCode),
+                    "id": string(resp.Status),
+                    "message": "GET:" + (
+                      (size(resp.Body) != 0) ?
+                        string(resp.Body)
+                      :
+                        string(resp.Status) + " (" + string(resp.StatusCode) + ")"
+                    ),
+                  },
+                },
+                "offset": 0,
+                "want_more": false,
+              }
+            )
+          )
+        )
+    ).as(state,
+      state.with(
+        !has(state.worklist) ?
+          state
+        : (size(state.worklist) > 0) ?
+          request(
+            "GET",
+            state.url.trim_right("/") + "/v0/messages/" + string(front(state.worklist, 1)[0])
+          ).with(
+            {
+              "Header": {
+                "Authorization": ["Bearer " + string(state.api_key)],
+              },
+            }
+          ).do_request().as(resp, (resp.StatusCode == 200) ?
+            // note the change here compared to message_group_array_index. state.with()
+            // is added so the state object is updated between loops.
+            bytes(resp.Body).decode_json().as(body,
+              state.with(
+                {
+                  "events": [
+                    {
+                      "message": body.encode_json(),
+                    },
+                  ],
+                  "worklist": tail(state.worklist, 1),
+                  // offset is a variable used to control paging on the message-group API that fills 'worklist'
+                  // increment when the worklist is empty
+                  "offset": (size(state.worklist) == 1) ? (int(state.offset) + int(state.page_size)) : state.offset,
+                  "want_more": true,
+                }
+              )
+            )
+          :
+            {
+              "events": {
+                "error": {
+                  "code": string(resp.StatusCode),
+                  "id": string(resp.Status),
+                  "message": "GET:" + (
+                    (size(resp.Body) != 0) ?
+                      string(resp.Body)
+                    :
+                      string(resp.Status) + " (" + string(resp.StatusCode) + ")"
+                  ),
+                },
+              },
+              "offset": 0,
+              "want_more": false,
+              "worklist" : []
+            }
+          )
+        :
+          {
+            "events": [],
+            "want_more": false,
+            "offset": 0,
+            "cursor": {
+              "last_timestamp": state.end_time,
+            },
+          }
+      )
+    )

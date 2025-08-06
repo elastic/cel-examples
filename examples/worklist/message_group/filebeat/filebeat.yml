@@ -1,0 +1,17 @@
+filebeat.inputs: []
+filebeat.config.inputs:
+  path: ${path.config}/inputs.d/*.yml
+  reload.enabled: true
+  reload.period: 10s
+setup.template.settings:
+  index.number_of_shards: 1
+setup.kibana:
+output.file:
+  path: ${path.config}/out
+  filename: filebeat
+  rotate_on_startup: true
+logging.level: "debug"
+logging.selectors: ['input.cel']
+logging.metrics.enabled: false
+setup.template.enabled: false
+

@@ -1,0 +1,16 @@
+version: '2.3'
+services:
+  testNoAuthNextLinks:
+    image: docker.elastic.co/observability/stream:v0.17.1
+    hostname: localhost
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./files:/files:ro
+    command:
+      - http-server
+      - --addr=:8090
+      - --config=/files/config-noauth.yml
+    environment:
+      PORT: 8090
+      HOSTNAME: localhost

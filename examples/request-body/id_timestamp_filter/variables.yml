@@ -1,0 +1,9 @@
+interval: 1m
+url: http://localhost:8090/test/api
+batch_size: 2
+data_path: data
+enable_request_tracer: false
+initial_interval: 24h
+sub_path: booking/history
+user: amiuser
+password: amipassword

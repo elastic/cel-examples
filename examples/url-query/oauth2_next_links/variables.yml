@@ -1,0 +1,11 @@
+interval: 1m
+url: http://localhost:8090/test/api
+batch_size: 2
+data_path: data
+enable_request_tracer: false
+sub_path: booking
+client_id: amiuser
+client_secret: amipassword
+token_url: http://localhost:8090/testoauth/token
+client_credentials: client_credentials
+

@@ -1,0 +1,152 @@
+config_version: 2
+interval: {{interval}}
+resource.url: {{url}}
+state:
+  page_size: {{page_size}}
+  offset: 0
+  initial_interval: {{initial_interval}}
+  api_key: {{api_key}}
+redact:
+  fields:
+    - api_key
+# This program writes a set of message group ids into a worklist, then loops over the ids
+# querying each message-group id to retrieve the list of messages for each group.
+# When 'worklist' is empty, this triggers another API call to fill the worklist
+# with more message-group ids. The pattern is a single call to the message-groups
+# API followed by a multiple calls to the message API to retrieve messages.
+# This example uses array indexing into the worklist.
+program: |-
+  (
+    // if the first api calls to message-group have filled 'worklist'
+    // return the state and skip calls to message-group API.
+    // When the first set of message-groups are worked off,
+    // 'worklist' will exist but will be empty, triggering another call
+    // to message-group API to retrieve more message-group ids.
+    (has(state.worklist) && size(state.worklist) > 0) ?
+      state
+    :
+      (
+        // 'want_more' is missing on initial call and false at the beginning of each periodic
+        // run. 'want_more' == false triggers initialization of time range parameters.
+        state.?want_more.orValue(false) ?
+          state
+        :
+          state.with(
+            {
+              "start_time": state.?cursor.last_timestamp.orValue((now - duration(state.initial_interval)).format(time_layout.RFC3339)),
+              "end_time": now.format(time_layout.RFC3339),
+            }
+          )
+      ).as(state,
+        state.with(
+          request(
+            "GET",
+            state.url.trim_right("/") + "/v0/message-groups?" + {
+              "created_at__gte": [state.start_time],
+              "created_at__lt": [state.end_time],
+              "flagged": ["true"],
+              "limit": [string(state.page_size)],
+              "offset": [string(state.offset)],
+            }.format_query()
+          ).with(
+            {
+              "Header": {
+                "Authorization": ["Bearer " + state.api_key],
+              },
+            }
+          ).do_request().as(resp, (resp.StatusCode == 200) ?
+            bytes(resp.Body).decode_json().as(body,
+              {
+                "worklist": (size(body.message_groups) > 0) ?
+                  body.message_groups.map(group,
+                    (has(group.messages) && size(group.messages) > 0) ? group.messages.map(e, e.id) : []
+                  ).flatten()
+                :
+                  [],
+                // next is the array index into worklist. The worklist is worked off starting
+                // at index 0
+                "next": 0,
+              }
+            )
+          :
+            {
+              "events": {
+                "error": {
+                  "code": string(resp.StatusCode),
+                  "id": string(resp.Status),
+                  "message": "GET:" + (
+                    (size(resp.Body) != 0) ?
+                      string(resp.Body)
+                    :
+                      string(resp.Status) + " (" + string(resp.StatusCode) + ")"
+                  ),
+                },
+              },
+              "want_more": false,
+            }
+          )
+        )
+      )
+  ).as(state,
+    state.with(
+      !has(state.worklist) ?
+        state
+      : (int(state.next) < size(state.worklist)) ?
+        request(
+          "GET",
+          state.url.trim_right("/") + "/v0/messages/" + state.worklist[state.next]
+        ).with(
+          {
+            "Header": {
+              "Authorization": ["Bearer " + string(state.api_key)],
+            },
+          }
+        ).do_request().as(resp, (resp.StatusCode == 200) ?
+          bytes(resp.Body).decode_json().as(body,
+            {
+              "events": [
+                {
+                  "message": body.encode_json(),
+                },
+              ],
+              // reset the worklist once all the values have been worked off
+              "worklist": (int(state.next) + 1 < size(state.worklist)) ? state.worklist : [],
+              // index into the worklist. Resets to 0 after the worklist has been worked off.
+              // next could also have been dropped using an optional
+              // ?"next": (int(state.next) + 1) < size(state.worklist) ? optional.of((int(state.next) + 1 )) : optional.none(),
+              "next": (int(state.next) + 1 < size(state.worklist)) ? (int(state.next) + 1) : 0,
+              // offset is a variable used to control paging on the message-group API that fills 'worklist'
+              "offset": (int(state.next) + 1 < size(state.worklist)) ? state.offset : (int(state.offset) + int(state.page_size)),
+              "want_more": true,
+            }
+          )
+        :
+          {
+            "events": {
+              "error": {
+                "code": string(resp.StatusCode),
+                "id": string(resp.Status),
+                "message": "GET:" + (
+                  (size(resp.Body) != 0) ?
+                    string(resp.Body)
+                  :
+                    string(resp.Status) + " (" + string(resp.StatusCode) + ")"
+                ),
+              },
+            },
+            "want_more": false,
+            "worklist" : []
+          }
+        )
+      :
+        {
+          "events": [],
+          "want_more": false,
+          // note the persistence of offset between periodic runs.
+          "offset": 0,
+          "cursor": {
+            "last_timestamp": state.end_time,
+          },
+        }
+    )
+  )
