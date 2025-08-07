@@ -13,7 +13,7 @@ available agent. The go.mod file
 for the beats version you are using will have the version of mito that filebeat
 was built with. https://github.com/elastic/beats/blob/main/go.mod
 
-Documentation for the mito extension of CEL can be found here
+Documentation for the mito CEL extensions available in Filebeat can be found here
 https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-CEL .
 Documentation for google CEL can be found here 
 https://github.com/google/CEL-spec/blob/master/doc/langdef.md
