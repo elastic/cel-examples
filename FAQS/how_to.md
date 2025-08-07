@@ -1,6 +1,6 @@
 # FAQ
 
-### What is the relationship between google CEL and elastic CEL?
+### What is the relationship between Google CEL and Elastic CEL?
 The Elastic mito project https://github.com/elastic/mito extends 
 google CEL with more evaluations including those that that support http requests
 . Written in go, Mito uses https://github.com/google/cel-go libraries.
