@@ -6,8 +6,10 @@ Numbers come in to CEL as floating point values when deserialized from JSON. Sim
 all numbers are serialized as floating point when being returned from a CEL evaluation.
 
 ### Handling errors with timestamp : no such overload: timestamp(double)
-A timestamp that is an integer needs to be explicitly
-case to an int
+A timestamp is a google.protobuf.Timestamp (or internally, a type Timestamp 
+struct{ time.Time }). As of mito 1.22.0, the timestamp(double) conversion fails 
+because there is no defined overload for converting from a double. To fix
+this cast the timestamp to an int.
 
 ```
 timestamp(int(ctx.timestamp))

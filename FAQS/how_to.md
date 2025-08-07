@@ -4,10 +4,11 @@
 The Elastic mito project https://github.com/elastic/mito extends 
 Google CEL with more extensions including those that that support HTTP requests.
 Written in go, mito uses https://github.com/google/cel-go libraries.
-Every function in go-CEL is available in mito except for send().
-Each version of mito is built on a specific version of go-CEL. Each version of
+Every function in cel-go is available in mito. Filebeat does not include the
+send() function from the cel-go library.
+Each version of mito is built on a specific version of cel-go. Each version of
 filebeat, which runs the mito library is bound to a specific version of mito.
-As CEL-go evolves, mito evolves as well. To get the latest mito version 
+As cel-go evolves, mito evolves as well. To get the latest mito version 
 available for CEL input, use the latest version of filebeat or the latest
 available agent. The go.mod file
 for the beats version you are using will have the version of mito that filebeat
@@ -336,58 +337,73 @@ to remove it.
 ```
 -- data --
 { 
-  "some_variable" : "imastring"
+  "some_variable": "imastring"
 }
 
 -- src --
+{}.as(body,
 state.with({
-    ?"limit": has(state.limit) ? optional.of(state.limit) : optional.none()
-})
+  ?"end_cursor": 
+    body.?data.hasNextPage.orValue(false) ?
+      body.?data.endCursor
+    :
+      optional.none()
+   ,
+}))
     
 -- out --
 {
 	"some_variable": "imastring"
 }
 
--- data --
-{ 
-  "some_variable" : "imastring",
-  "limit": 1
-}
-
 -- src --
+
+{"data":{}}.as(body,
 state.with({
-    ?"limit": has(state.limit) ? optional.of(state.limit) : optional.none()
-})
-    
+  ?"end_cursor": 
+    body.?data.hasNextPage.orValue(false) ?
+      body.?data.endCursor
+    :
+      optional.none()
+   ,
+}))
+
 -- out --
 {
-	"limit": 1,
 	"some_variable": "imastring"
 }
 
 -- src --
+{"data":{"hasNextPage" : true, "endCursor": "nfnfdwo"}}.as(body,
 state.with({
-    ?"limit": has(state.limit) ? optional.of(state.limit) : optional.none()
-})
-    
+  ?"end_cursor": 
+    body.?data.hasNextPage.orValue(false) ?
+      body.?data.endCursor
+    :
+      optional.none()
+   ,
+}))
+
 -- out --
 {
-	"limit": 1,
+	"end_cursor": "nfnfdwo",
 	"some_variable": "imastring"
 }
+
 ```
 
 ### Use optional.none() over null
 The use of null requires this syntax
 ```
-has(value) && has(value) != null
-or
-!has(value) !! value == null
+state.?value && state.value != null
+vs
+state.?value
+
 ```
 
 Using optional.none() removes the value entirely removing the requirement to
 check for null.
+
 
 ### Handling "found no matching overload for 'with' applied to" errors
 The work around for this is to use dyn(< the object>) to allow for runtime 
