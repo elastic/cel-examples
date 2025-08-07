@@ -2,8 +2,8 @@
 
 ###  Integers being converted to doubles
 
-Numbers come in to CEL as double when deserialized from JSON. As well,
-integers published as JSON from CEL will be converted to doubles.
+Numbers come in to CEL as floating point values when deserialized from JSON. Similarly,
+all numbers are serialized as floating point when being returned from a CEL evaluation.
 
 ### Handling errors with timestamp : no such overload: timestamp(double)
 A timestamp that is an integer needs to be explicitly
