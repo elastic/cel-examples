@@ -2,8 +2,8 @@
 
 ### What is the relationship between Google CEL and Elastic CEL?
 The Elastic mito project https://github.com/elastic/mito extends 
-google CEL with more evaluations including those that that support http requests
-. Written in go, Mito uses https://github.com/google/cel-go libraries.
+Google CEL with more extensions including those that that support HTTP requests.
+Written in go, mito uses https://github.com/google/cel-go libraries.
 Every function in go-CEL is available in mito except for send().
 Each version of mito is built on a specific version of go-CEL. Each version of
 filebeat, which runs the mito library is bound to a specific version of mito.
