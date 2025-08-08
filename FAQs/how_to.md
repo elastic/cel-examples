@@ -16,7 +16,7 @@ was built with. https://github.com/elastic/beats/blob/main/go.mod
 
 Documentation for the mito CEL extensions available in Filebeat can be found here
 https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-CEL .
-Documentation for google CEL can be found here 
+Documentation for Google CEL can be found here 
 https://github.com/google/CEL-spec/blob/master/doc/langdef.md
 
 ### What is the relationship between mito, CEL scripts and filebeat.
