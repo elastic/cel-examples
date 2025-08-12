@@ -17,8 +17,3 @@ failed API call to be run. Tests can be run using mito or filebeat.
 To test all states, run docker-compose.yml then stop that container and run
 one of the server error containers. Inspect output to manually verify
 expected states.
-
-
-
-
-

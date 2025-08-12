@@ -53,7 +53,7 @@ program: |-
       "error"
     ).as(resp,
       (resp.StatusCode == 200) ?
-        bytes(resp.Body).decode_json().as(body,
+        resp.Body.decode_json().as(body,
           state.with(
             {
               // body.data and body.links.day are specific to the

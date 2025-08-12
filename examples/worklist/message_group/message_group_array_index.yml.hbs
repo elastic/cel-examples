@@ -55,7 +55,7 @@ program: |-
               },
             }
           ).do_request().as(resp, (resp.StatusCode == 200) ?
-            bytes(resp.Body).decode_json().as(body,
+            resp.Body.decode_json().as(body,
               {
                 "worklist": (size(body.message_groups) > 0) ?
                   body.message_groups.map(group,
@@ -102,7 +102,7 @@ program: |-
             },
           }
         ).do_request().as(resp, (resp.StatusCode == 200) ?
-          bytes(resp.Body).decode_json().as(body,
+          resp.Body.decode_json().as(body,
             {
               "events": [
                 {

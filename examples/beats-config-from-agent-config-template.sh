@@ -88,4 +88,3 @@ fi
 
 # Cleanup
 rm "$TMP_JSON"
-

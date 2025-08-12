@@ -404,6 +404,17 @@ state.?value
 Using optional.none() removes the value entirely removing the requirement to
 check for null.
 
+### Why do I see "found no matching overload for '_?_:_' applied to '(bool, list(dyn), map(dyn, dyn))' when I have true ? []: {}"?
+The compile time type does not allow the evaluation. Use dyn() to allow
+runtime determination of type. For this specific example, dyn() is only
+required for one term. Other examples may require that both be runtime typed.
+```
+true ? dyn([]) : {}
+or
+true ? [] : dyn({})
+or
+true ? dyn([]) : dyn({})
+```
 
 ### Handling "found no matching overload for 'with' applied to" errors
 The work around for this is to use dyn(< the object>) to allow for runtime 
@@ -471,5 +482,7 @@ zip(
 	}
 }
 ```
-
-
+### Why do some integrations use "bytes(resp.Body).decode_json()" while others use resp.Body.decode_json()
+"resp.Body.decode_json()" is preferred. In early releases of mito 
+"bytes(resp.Body).decode_json()" was the correct syntax. This is no longer the 
+case. 

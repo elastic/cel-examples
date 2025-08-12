@@ -55,7 +55,7 @@ program: |-
               },
             }
           ).do_request().as(resp, (resp.StatusCode == 200) ?
-            bytes(resp.Body).decode_json().as(body,
+            resp.Body.decode_json().as(body,
               {
                 "worklist": (size(body.message_groups) > 0) ?
                   body.message_groups.map(group,
@@ -102,7 +102,7 @@ program: |-
         ).do_request().as(resp, (resp.StatusCode == 200) ?
           // note the change here compared to message_group_array_index. state.with()
           // is added so the state object is updated between loops.
-          bytes(resp.Body).decode_json().as(body,
+          resp.Body.decode_json().as(body,
             state.with(
               {
                 "events": [

@@ -4,4 +4,3 @@ batch_size: 2
 data_path: data
 enable_request_tracer: false
 sub_path: booking
-

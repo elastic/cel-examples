@@ -17,6 +17,8 @@ state:
   limit: {{batch_size}}
   data_path: {{data_path}}
   sub_path: {{sub_path}}
+# Empty redact fields declaration
+redact.fields:
 program: |-
   state.with(
     get_request(
@@ -29,7 +31,7 @@ program: |-
     )
   ).do_request().as(resp,
     (resp.StatusCode == 200) ?
-      bytes(resp.Body).decode_json().as(body,
+      resp.Body.decode_json().as(body,
         state.with(
           {
             "events": body.data.map(e, {"message": e.encode_json()}),

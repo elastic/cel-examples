@@ -2,14 +2,21 @@
 
 ## Failure types
 ### Requests return non 2xx responses
+Non-2xx Responses from the third party server being queried from CEL:
 1. Authorization or authentication errors, usually 401 or 403. Authorization
 errors often return 404 errors to not leak information.
-2. Rate limiting causing 429 errors.
-3. Target server changed API request contract resulting in 4xx errors.
-4. Unexpected transitory issues with the target server causing 5xx or 4xx errors.
-5. 404 errors due to the API of the request being incorrect.
+2. 429 "Too Many Requests" errors when the server is rate limiting requests.
+3. 400 errors due to unexpected changes in the API request contract. These 
+   errors cannot be recovered. It's important that they are not silently
+   ignored and that processing is stopped.
+4. Transitory 5xx errors that can be recovered. In some cases, 4xx errors may
+   be returned if a subsystem is down on a third party server.
+5. 404 errors from resources that have been removed. For instance if the 
+   program gathers a set of IDs from one API and then queries for information
+   for each ID in another API call, the resource could have been deleted since
+   the original call.
 
-##### Reset all variables so periodic run restarts from same conditions
+#### Reset all variables so periodic run restarts from same conditions
 
 1. Steps to implement
    1. Set 'want_more' to false.
@@ -62,4 +69,3 @@ has an example of using the try function.
 2. Without the try function, the cel script will automatically retry the API 
 indefinitely. see
 https://www.elastic.co/docs/reference/beats/filebeat/elasticsearch-output#_max_retries
-

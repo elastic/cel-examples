@@ -4,6 +4,7 @@ rules:
     query_params:
       limit: 2
     request_headers:
+# YW1pdXNlcjphbWlwYXNzd29yZA== is the user and password 'amiuser:amipassword' base64 encoded
       Authorization: "Basic YW1pdXNlcjphbWlwYXNzd29yZA=="
     request_body: /.*"lastTestedDate","operator":"LESSER","value":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"}]}.*/
     responses:
@@ -12,17 +13,17 @@ rules:
           {{ minify_json `
           {
           "data":[
-              {
-                "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
-                "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
-                "passenger_name":"John Apple"
-               },
-               {
-                  "id":"ab75ff48-ab45-4bb5-9d02-88745177dedb",
-                  "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
-                   "passenger_name":"Jane Artichoke"
-               }
-              ],
+            {
+              "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+              "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
+              "passenger_name":"John Apple"
+             },
+             {
+                "id":"ab75ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
+                 "passenger_name":"Jane Artichoke"
+             }
+          ],
           "hasMoreRecords":"true",
           "lastId": "ab75ff48-ab45-4bb5-9d02-88745177dedb"
           }`

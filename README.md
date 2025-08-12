@@ -7,14 +7,14 @@ working with the Elastic mito extension of CEL understand the language better
 and to be more productive. 
 
 ### CEL
-Common Expression Language (CEL) is non-turing complete functional language.
+Common Expression Language (CEL) is non-Turing complete functional language.
 Elastic chose CEL due to its performance and safety. Rather than using a sandbox 
 to run the program, CEL can be embedded as a library. Elastic extended CEL in 
 the mito project to include support for requesting and processing API requests.
 
 As a non-turing complete functional language, the structure of CEL programs can 
 seem foreign to procedural or object-oriented programmers. For more information 
-on CEL and mito CEL see the official documentation:
+on CEL and mito extensions, see the official documentation:
 [Google CEL](https://github.com/google/CEL-spec/blob/master/doc/langdef.md),
 [mito CEL extension](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-CEL). 
 

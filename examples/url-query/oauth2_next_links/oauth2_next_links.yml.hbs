@@ -27,6 +27,8 @@ state:
   limit: {{batch_size}}
   data_path: {{data_path}}
   sub_path: {{sub_path}}
+# Empty redact fields declaration
+redact.fields:
 program: |-
   state.with(
     get_request(
@@ -37,15 +39,15 @@ program: |-
     )
   ).do_request().as(resp,
     (resp.StatusCode == 200) ?
-      bytes(resp.Body).decode_json().as(body,
+      resp.Body.decode_json().as(body,
         state.with(
           {
             // body.data and body.links.day are specific to the
             // response returned.
             "events": body.data.map(e, {"message": e.encode_json()}),
-            "want_more": has(body.links) && has(body.links.next) && body.links.next != null,
+            "want_more": has(body.?links.next) && body.links.next != null,
             // the leading ? marks this field an optional type.
-            ?"next": (has(body.links) && has(body.links.next)) ? optional.of(body.links.next) : optional.none(),
+            ?"next": body.?links.next,
           }
         )
       )

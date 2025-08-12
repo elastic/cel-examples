@@ -27,19 +27,19 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
+            "data":[
               {
                 "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
                 "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
                 "passenger_name":"John Apple"
-               },
-               {
-                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
-                  "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
-                   "passenger_name":"Jane Artichoke"
-               }
-              ],
-           "links":{
+              },
+              {
+                "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
+                 "passenger_name":"Jane Artichoke"
+              }
+            ],
+            "links":{
               "self":"a1b2",
               "next":"a2b2"
             }
@@ -57,19 +57,19 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
+            "data":[
               {
                 "id":"cd5af2c-f477-43c4-8bdf-a00bdb939d65",
                 "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
                 "passenger_name":"George Doe"
-               },
-               {
-                  "id":"cd25ff48-ab45-4bb5-9d02-88745177dedb",
-                  "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
-                  "passenger_name":"Joan Doe"
-               }
-              ],
-           "links":{
+              },
+              {
+                "id":"cd25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"Joan Doe"
+              }
+            ],
+            "links":{
               "previous":"a1b2",
               "self":"a2b2",
               "next":"a3b2"
@@ -88,19 +88,19 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
+            "data":[
               {
                 "id":"ef5af2c-f477-43c4-8bdf-a00bdb939d65",
                 "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
                 "passenger_name":"James Effort"
-               },
-               {
-                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
-                  "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
-                  "passenger_name":"Jenny Ergo"
-               }
-              ],
-           "links":{
+              },
+              {
+                "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"Jenny Ergo"
+              }
+            ],
+            "links":{
               "previous":"a2b2",
               "self":"a3b2"
             }
@@ -119,14 +119,14 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
+            "data":[
               {
                 "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
                 "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
                 "passenger_name":"John Apple"
-               }
-              ],
-           "links":{
+              }
+            ],
+            "links":{
               "self":"a1b1",
               "next":"a2b1"
             }          
@@ -144,14 +144,14 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
-               {
-                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
-                  "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
-                   "passenger_name":"Jane Artichoke"
-               }
-              ],
-           "links":{
+            "data":[
+              {
+                "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Jane Artichoke"
+              }
+            ],
+            "links":{
               "previous":"a1b1",
               "self":"a2b1",
               "next":"a3b1"
@@ -170,14 +170,14 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
+            "data":[
               {
                 "id":"cd5af2c-f477-43c4-8bdf-a00bdb939d65",
                 "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
                 "passenger_name":"George Doe"
-               }
-              ],
-           "links":{
+              }
+            ],
+            "links":{
               "previous":"a2b1",
               "self":"a3b1",
               "next":"a4b1"
@@ -196,14 +196,14 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
-               {
-                  "id":"cd25ff48-ab45-4bb5-9d02-88745177dedb",
-                  "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
-                  "passenger_name":"Joan Doe"
-               }
-              ],
-           "links":{
+            "data":[
+              {
+                "id":"cd25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"Joan Doe"
+              }
+            ],
+            "links":{
               "previous":"a3b1",
               "self":"a4b1",
               "next":"a5b1"
@@ -222,14 +222,14 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
+            "data":[
               {
                 "id":"ef5af2c-f477-43c4-8bdf-a00bdb939d65",
                 "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
                 "passenger_name":"James Effort"
-               }
-              ],
-           "links":{
+              }
+            ],
+            "links":{
               "previous":"a4b1",
               "self":"a5b1",
               "next":"a6b1"
@@ -246,14 +246,14 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
-               {
-                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
-                  "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
-                  "passenger_name":"Jenny Ergo"
-               }
-              ],
-           "links":{
+            "data":[
+              {
+                "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"Jenny Ergo"
+              }
+            ],
+            "links":{
               "previous":"a5b1",
               "self":"a6b1"
             }          
@@ -270,19 +270,19 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
+            "data":[
               {
                 "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
                 "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
                 "passenger_name":"John Apple"
-               },
-               {
-                  "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
-                  "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
-                   "passenger_name":"Jane Artichoke"
-               }
-              ],
-           "links":{
+              },
+              {
+                "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Jane Artichoke"
+              }
+            ],
+            "links":{
               "self":"a1b2",
               "next":"a2b2"
             }
@@ -299,14 +299,14 @@ rules:
         body: |-
           {{ minify_json `
           {
-          "data":[
+            "data":[
               {
                 "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
                 "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
                 "passenger_name":"John Apple"
-               }
-              ],
-           "links":{
+              }
+            ],
+            "links":{
               "self":"a1b1",
               "next":"a2b1"
             }          

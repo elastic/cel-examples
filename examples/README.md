@@ -111,5 +111,3 @@ example docker container at a time. Synsc changed port numbers in
 ./docker/files/config.yml and varibles.yml
 2. The name of mock api server is defined in ./docker/docker-compose.yml under
 services. This name is the name of the container in docker.
-
-
