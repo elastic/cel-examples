@@ -61,7 +61,7 @@ for worklists. Using automatic authentication is also relatively recent.
 https://github.com/elastic/mito can be used to create a 'mito' executable which
 can be used at the command line to compile and run cel programs.
 
-https://github.com/elastic/miko is a UI playground for working with the mito CEL 
+[miko](https://github.com/efd6/miko) is a UI playground for working with the mito CEL 
 extension. To open the playground:
 ```
 cd miko
