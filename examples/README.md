@@ -8,7 +8,7 @@ Each example has its own directory with an agent configuration file
 ```
 ├── README.md       # This file
 ├── beats-config-from-agent-config-template.sh   #script
-├── filebeat-cel-input-base.yaml     #File for the filebeat cel-input file to
+├── filebeat-cel-input-base.yml     #File for the filebeat cel-input file to
 │                                     which the cel progam will be added.
 │                                     Can be any name.                                     
 └── example_set_name/            # groups of examples that are related
@@ -75,7 +75,7 @@ beats-config-from-agent-config-template.sh
 cd ./example_set_name/example_name
 
 ../../beats-config-from-agent-config-template.sh \
- -c ../../filebeat-cel-input-base.yaml \
+ -c ../../filebeat-cel-input-base.yml \
  -t example_name.yml.hbs \
  -v variables.yml \
  -o ./filebeat/inputs.d/test.yml \

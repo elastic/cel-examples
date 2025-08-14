@@ -386,7 +386,7 @@ true
 4. Click OK.  
 5. Click on (+) under File name patterns:  
    ![](./images/image3.png)
-6. Add file suffixes that you want associated with cel script files. (suggest \*.cel and \*.yml.hbs or cel.yml.hbs to differentiate from httpjson files)  
-     
+6. Add file suffixes that you want associated with cel script files. 
+   (suggest \*.cel and \*.yml.hbs or cel.yml.hbs to differentiate from httpjson files)  
    ![](./images/image4.png)
 7. Click OK 
