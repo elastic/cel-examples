@@ -425,8 +425,6 @@ object = {...}
 
 dyn(object)
 ```
-If you see this, please create an issue with a reproducible test case in
-the mito repository.
 
 ### Handling type 'string' does not support field selection errors
 
