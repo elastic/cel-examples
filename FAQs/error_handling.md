@@ -1,58 +1,39 @@
 # Error Handling
 
-## Failure types
-### Requests return non 2xx responses
-Non-2xx Responses from the third party server being queried from CEL:
-1. Authorization or authentication errors, usually 401 or 403. Authorization
-errors often return 404 errors to not leak information.
-2. 429 "Too Many Requests" errors when the server is rate limiting requests.
-3. 400 errors due to unexpected changes in the API request contract. These 
-   errors cannot be recovered. It's important that they are not silently
-   ignored and that processing is stopped.
-4. Transitory 5xx errors that can be recovered. In some cases, 4xx errors may
-   be returned if a subsystem is down on a third party server.
-5. 404 errors from resources that have been removed. For instance if the 
-   program gathers a set of IDs from one API and then queries for information
-   for each ID in another API call, the resource could have been deleted since
-   the original call.
+#### What is the effect of errors on the value of 'want_more' when a CEL program is run from Filebeat
+CEL programs can exit normally, exit with errors or exit due to hitting the
+maximum number of executions allowed in a periodic run.
+1. On normal execution, the CEL program will set 'want_more' to false which
+   signals that the CEL program is not to be run again during this periodic run.
+2. On error, 'want_more', filebeat will set 'want_more' to false.
+3. If the periodic run hits the maximum number of executions allowed for the 
+   periodic run, Filebeat will not reset 'want_more'. This allows the program to
+   resume using an unchanged state object.
 
-#### Reset all variables so periodic run restarts from same conditions
-
-1. Steps to implement
-   1. Set 'want_more' to false.
-   2. Reset all temporary periodic variables.
-   3. Rollback any changes in the cursor OR write the program so the cursor
-      is only updated when the run is successfully completed and 'want_more' is set to
-      false.
-2. Cons
-   1. If the error started in the middle of the periodic run after some events
-      were sent, this will most likely cause duplicate events to be sent when the
-      periodic run restarts. Use a fingerprint to stop ingestion of duplicate events.
-   2. Variables that are left over from incomplete periodic runs can cause
-      unexpected behavior.
-   3. Program can get behind if it restarts continually from the same place.
-3. Pros
-   1. Straight forward implementation.
-   2. Robust.
-   3. Well written state management translates well to an integration that is 
-      moved to a new agent. (i.e. only the cursor is available after moving)
-
-#### Allow program to resume where it left off
-1. Steps to implement
-   1. Use 'want_more' only to signal that the periodic run is over, not that it
-      was complete. Do not use it as a signal that periodic run variables need
-      to be initialized.
-   2. Use state.with() around the returned objects so periodic run variables
-      are not lost on errors.
-   3. Reset all periodic run variables after the periodic run successfully
-      completes.
-2. Cons
-   1. Requires discipline in the use of periodic run variables and 'want_more.'
-   2. Needs more testing than the "reset" method.
-3. Pros
-   1. Useful for integrations that occasionally exceed maximum executions.
-   2. Useful when connection issues are common.
-
+#### Be aware of the effect of the state of variables when the periodic run exits with an error.
+1. Make a decision about how the program should resume after failure. 
+   1. Does the program need to restart from the initial conditions of the failed
+      periodic run?
+   2. Can the program restart from the place where it failed?
+2. To start from the same initial conditions as the failed periodic run:
+   1. Reset all temporary periodic variables when an error occurs.
+   2. Rollback any changes in the cursor OR write the program so the cursor
+      is only updated when the run is successfully completed and 'want_more' is 
+      set to false.
+   3. Be aware of the effect of potentially sending duplicate events. Using a
+      fingerprint processor will stop the indexing of duplicate events. 
+3. To allow the program to resume after an error:
+   1. Do not use 'want_more' as a signal that periodic run variables need
+      to be initialized. Due to 'want_more' being set to false on an error, using
+      'want_more' == false as a signal to initialize variables will cause 
+       those variables to be overwritten.
+   2. Update the cursor or other variables on each invocation of the CEL 
+      program.
+4. Depending upon how you have designed the initialization of variables for a
+   periodic run, the variables may need to be cleared when periodic run 
+   successfully completes.
+5. Be aware that if the integration is moved from one agent to another agent,
+   only the cursor object in the state object will be copied. 
 
 ### HTTP Request fails completely with no http status code.
 1. Internet problems causing intermittent communications errors where there

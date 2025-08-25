@@ -19,24 +19,26 @@ https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-CEL .
 Documentation for Google CEL can be found here 
 https://github.com/google/CEL-spec/blob/master/doc/langdef.md
 
-### What is the relationship between mito, CEL scripts and filebeat.
+### What is the relationship between mito, CEL programs and filebeat.
 The CEL program is a script that is run by filebeat using the mito library.
-Filebeat will keep running (invoking or evaluating) the CEL script
+Filebeat will keep running (invoking or evaluating) the CEL program
 until the state variable 'want_more' is false. The evaluation of 'want_more' 
-occurs outside the CEL script and outside mito. Using mito to run the CEL script
-is equivalent to running a single invocation (evaluation) of the CEL script by
-filebeat.
+occurs outside the CEL program and outside mito. Using mito to run the CEL 
+program is equivalent to running a single invocation (evaluation) of the CEL 
+program by Filebeat.
 
-### Why are url, api_key not available in the second periodic run?
-url and api keys are set in the state object on the initial run of the program.
-The state on the next periodic run is the state that was returned from the 
-previous periodic run. If the returned object is not derived from the state 
-object using the state.with() syntax, the state object will contain only what
-was returned. There are two ways to handle this:
-1. Wrap the program with state.with() so every object returned has all the state
-variables.
-2. Explicitly set the variables that you want to be available in the next
-periodic run.
+### Why are some fields missing on the second periodic run?
+The state object is created on the initial run of the program. On agent restarts
+state is initialized from the cursor field and from fields defined in the 
+configuration. If url is missing from the state object, it will be added to 
+state at the beginning of the periodic run. The state on the next periodic run 
+is the state that was returned from the last evaluation of the previous periodic 
+run. The developer controls what is returned. The problem of missing fields 
+occurs if the returned object from the program evaluation does not contain the 
+expected fields. This occurs if returned object is
+is not created with the state.with() syntax, or if the developer has not
+explicitly set fields in the returned object. Best practice is to keep fields 
+that should be persisted across periodic runs in the cursor object.  
 
 ### Why is CEL preferred over HTTPJSON?
 CEL is the preferred input method as HTTPJSON is planned to be phased out in
@@ -50,14 +52,15 @@ integrations.
 3. CEL is easier to debug than HTTPJSON.
 
 ### Real-world examples?
-https://github.com/elastic/integrations.packages has over 150 integrations, many
-written using CEL. To find an integration using CEL, look for files called
-CEL.yml.hbs under <datastream>/agent. We have evolved our use of CEL over
-time so some examples more closely align with how we do things now. The use
-of tail() for worklists is recent. Many integrations still use array indexing
-for worklists. Using automatic authentication is also relatively recent.
+https://github.com/elastic/integrations/tree/main/packages has over 150 
+integrations, many written using CEL. To find an integration using CEL, look for 
+files called CEL.yml.hbs under <datastream>/agent. We have evolved our use of 
+CEL over time so some examples more closely align with how we do things now. The 
+use of tail() for worklists is recent. Many integrations still use array 
+indexing for worklists. Using automatic authentication is also relatively 
+recent.
 
-### Compiling and testing CEL scripts without filebeat
+### Compiling and testing CEL programs without filebeat
 https://github.com/elastic/mito can be used to create a 'mito' executable which
 can be used at the command line to compile and run cel programs.
 
