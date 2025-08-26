@@ -1,6 +1,6 @@
 # How to setup an editor in Intellij products for CEL
 
-These instructions will associate cel script files with an editor that
+These instructions will associate CEL source files with an editor that
 supports matching braces, brackets and parenthesis as well as autocomplete 
 on keywords. The keywords list that are added are all the macros supported by 
 CEL and the Elastic extensions in mito.
@@ -386,7 +386,7 @@ true
 4. Click OK.  
 5. Click on (+) under File name patterns:  
    ![](./images/image3.png)
-6. Add file suffixes that you want associated with cel script files. 
+6. Add file suffixes that you want associated with CEL source files. 
    (suggest \*.cel and \*.yml.hbs or cel.yml.hbs to differentiate from httpjson files)  
    ![](./images/image4.png)
 7. Click OK 

@@ -1,100 +1,104 @@
 # FAQ
 
 ### What is the relationship between Google CEL and Elastic CEL?
+
 The Elastic mito project https://github.com/elastic/mito extends 
 Google CEL with more extensions including those that that support HTTP requests.
 Written in go, mito uses https://github.com/google/cel-go libraries.
-Every function in cel-go is available in mito. Filebeat does not include the
-send() function from the cel-go library.
+Every function in cel-go is available in mito.
 Each version of mito is built on a specific version of cel-go. Each version of
-filebeat, which runs the mito library is bound to a specific version of mito.
+Filebeat, which runs the mito library is bound to a specific version of mito.
 As cel-go evolves, mito evolves as well. To get the latest mito version 
-available for CEL input, use the latest version of filebeat or the latest
+available for CEL input, use the latest version of Filebeat or the latest
 available agent. The go.mod file
-for the beats version you are using will have the version of mito that filebeat
+for the beats version you are using will have the version of mito that Filebeat
 was built with. https://github.com/elastic/beats/blob/main/go.mod
 
-Documentation for the mito CEL extensions available in Filebeat can be found here
-https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-CEL .
-Documentation for Google CEL can be found here 
-https://github.com/google/CEL-spec/blob/master/doc/langdef.md
+Documentation for the mito CEL extensions available in Filebeat can be found
+[here](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-CEL).
+Documentation for Google CEL can be found [here](https://github.com/google/CEL-spec/blob/master/doc/langdef.md).
 
-### What is the relationship between mito, CEL programs and filebeat.
-The CEL program is a script that is run by filebeat using the mito library.
-Filebeat will keep running (invoking or evaluating) the CEL program
-until the state variable 'want_more' is false. The evaluation of 'want_more' 
-occurs outside the CEL program and outside mito. Using mito to run the CEL 
-program is equivalent to running a single invocation (evaluation) of the CEL 
-program by Filebeat.
+### What is the relationship between mito, CEL programs and Filebeat.
+
+CEL programs are run by Filebeat using the cel-go CEL implementation and the
+mito extension library. Filebeat will keep running (invoking or evaluating) the
+CEL program until the `state` variable `want_more` is false. The evaluation
+of `want_more` occurs outside the CEL program and outside mito. Using mito to
+run the CEL program is equivalent to running a single invocation(evaluation) of
+the CEL program by Filebeat.
 
 ### Why are some fields missing on the second periodic run?
-The state object is created on the initial run of the program. On agent restarts
-state is initialized from the cursor field and from fields defined in the 
-configuration. If url is missing from the state object, it will be added to 
-state at the beginning of the periodic run. The state on the next periodic run 
-is the state that was returned from the last evaluation of the previous periodic 
+
+The `state` object is created on the initial run of the program. On agent restarts
+`state` is initialized from the cursor field and from fields defined in the 
+configuration. If `url` is missing from the `state` object, it will be added to 
+`state` at the beginning of the periodic run. The `state` on the next periodic run 
+is the `state` that was returned from the last evaluation of the previous periodic 
 run. The developer controls what is returned. The problem of missing fields 
 occurs if the returned object from the program evaluation does not contain the 
 expected fields. This occurs if returned object is
-is not created with the state.with() syntax, or if the developer has not
+is not created with the `state.with(...)` syntax, or if the developer has not
 explicitly set fields in the returned object. Best practice is to keep fields 
-that should be persisted across periodic runs in the cursor object.  
+that should be persisted across periodic runs in the cursor object.
 
-### Why is CEL preferred over HTTPJSON?
-CEL is the preferred input method as HTTPJSON is planned to be phased out in
+### Why is CEL preferred over HTTP JSON?
+
+CEL is the preferred input method as HTTP JSON is planned to be phased out in
 favor on CEL. The reasons for this are:
-1.CEL allows for more complex logic and transformations on data, both in 
-requests and responses, compared to the more limited capabilities of the 
-HTTPJSON input.
+1. CEL allows for more complex logic and transformations on data, both in 
+   requests and responses, compared to the more limited capabilities of the 
+   HTTP JSON input.
 2. CEL provides a more programmatic and expressive way to interact with APIs 
-and process data, leading to a better development workflow for custom 
-integrations.
-3. CEL is easier to debug than HTTPJSON.
+   and process data, leading to a better development workflow for custom 
+   integrations.
+3. CEL is easier to debug than HTTP JSON.
 
 ### Real-world examples?
-https://github.com/elastic/integrations/tree/main/packages has over 150 
-integrations, many written using CEL. To find an integration using CEL, look for 
-files called CEL.yml.hbs under <datastream>/agent. We have evolved our use of 
-CEL over time so some examples more closely align with how we do things now. The 
-use of tail() for worklists is recent. Many integrations still use array 
-indexing for worklists. Using automatic authentication is also relatively 
-recent.
 
-### Compiling and testing CEL programs without filebeat
-https://github.com/elastic/mito can be used to create a 'mito' executable which
-can be used at the command line to compile and run cel programs.
+The [elastic/integrations respository](https://github.com/elastic/integrations/tree/main/packages)
+has over 150 integrations, many written using CEL. To find an integration using
+CEL, look for files called cel.yml.hbs under \<datastream\>/agent. We have
+evolved our use of CEL over time so some examples more closely align with how we
+do things now. The use of `tail()` for worklists is recent. Many integrations
+still use array indexing for worklists.
 
-[miko](https://github.com/efd6/miko) is a UI playground for working with the mito CEL 
-extension. To open the playground:
+### Compiling and testing CEL programs without Filebeat
+
+[`mito`](https://github.com/elastic/mito) can be used to create
+a `mito` executable which can be used at the command line to compile and run CEL
+programs.
+
+[`miko`](https://github.com/efd6/miko) is a UI playground for working with the
+mito CEL extension. To install the playground:
 ```
-cd miko
-go build 
-./miko
-``` 
-https://github.com/elastic/celfmt is a tool to compile and format the cel 
-program.
+go install github.com/efd6/miko
+```
+`miko` requires that `mito` is installed.
 
-Note, that each of these tools are versioned, as is filebeat. Running different
+[`celfmt`](https://github.com/elastic/celfmt) is a tool to compile and format the CEL 
+program. If `celfmt` is installed, `miko` can use it to format the code in the
+playground.
+
+Note, that each of these tools are versioned, as is Filebeat. Running different
 versions of the tools on the same program may result in different behavior.
-Try to use the versions required by the minimum version of filebeat that is 
-being targeted. The go.mod file for the beats version you are using will have 
-the version of mito that filebeat was built with. Make sure that you are using
-the correct tag for the beats repository
-https://github.com/elastic/beats/blob/main/go.mod. The go.mod for miko and 
-celfmt will also have the 
-
-
+Try to use the versions required by the minimum version of Filebeat that is 
+being targeted. The go.mod file for the Beats version you are using will have 
+the version of mito that Filebeat was built with. Make sure that you are using
+the correct tag for the Beats repository
+https://github.com/elastic/beats/blob/main/go.mod. 
 
 ### Implementing loops?
-CEL is a non-turing complete language. It does not support loops. The use of 
-'want_more' to continually loop over the program until want_more is false is
-controlled by filebeat or mito. Looping can be emulated by using 'want_more',
-even in more complex programs.
+
+CEL is a non-Turing complete language. It does not support unbounded loops. The
+use of `want_more` to continually loop over the program until `want_more` is
+false is controlled by Filebeat or mito. Looping can be emulated by using
+`want_more`, even in more complex programs.
 [message_group_tail.yml.hbs](../examples/worklist/message_group/message_group_tail.yml.hbs)
-shows an example of creating a worklist from one api call that then gets 
+shows an example of creating a worklist from one API call that then gets 
 worked off in recurring evocations of the program.
 
 ### Convert an array of numbers to an array of strings
+
 ```
 -- data -- 
 { "list": [1,2,3] }
@@ -111,7 +115,8 @@ state.list1.map(num, string(num))
 
 ```
 ### Create a map of numbers
-When output in a state object, keys in maps must be strings.
+
+When output in a `state` object, keys in maps must be strings.
 Used as a temporary object, the keys can be numbers.
 
 
@@ -142,6 +147,7 @@ zip(state.list, state.list)
 failed proto conversion: type conversion error from Double to 'string'
 ```
 ### Check if a value exists in a map
+
 ```
 -- data --
 {   
@@ -149,9 +155,9 @@ failed proto conversion: type conversion error from Double to 'string'
 	"10": 10,
 	"2": 2,
 	"9": 9
-   },
-   "nine" : "9",
-   "five" : "5"
+	},
+	"nine" : "9",
+	"five" : "5"
 }
 
 -- src --
@@ -165,20 +171,21 @@ false
 
 -- src --
 try(state.list_map[state.nine], "map_has_no_key_error").as(
-   value,
-   !has(value.map_has_no_key_error)
+	value,
+	!has(value.map_has_no_key_error)
 )
 -- out --
 true
 ```
 
 ### Check if a list does not contain a value.
+
 Convert the list to a map, then use try to check for the key
 ```
 -- data --
 {
-  "list": [1,2,3],
-  "number": 3
+	"list": [1,2,3],
+	"number": 3
 }
 
 -- src --
@@ -189,6 +196,7 @@ try(zip(state.list, state.list)[state.number], "has_no_such_key_error")
 true
 ```
 ### Creating a sorted deduplicated list
+
 zip the list with itself to produce a map where the key and value are the same
 value in a list, then take list the keys;
 ```
@@ -210,6 +218,7 @@ state.list.zip(state.list).keys()
 ```
 
 ### Comparing two lists and returning values from the second list that do not occur in the first list. (set operation complement)
+
 ```
 Given 2 unordered, non-sorted, non-unique lists.
 
@@ -247,6 +256,7 @@ zip(state.list1, state.list1).as(existing,
 ```
 
 ### Adding two lists? (set operation union)
+
 ```
 -- data --
 { "list1": [9,10,2] , "list2" : [4,8,7] }
@@ -266,6 +276,7 @@ zip(state.list1, state.list1).as(existing,
 ```
 
 ### Adding two lists and sort result? (set operation union)
+
 ```
 -- data --
 { "list1": [9,10,2] , "list2" : [4,8,7] }
@@ -285,6 +296,7 @@ zip(state.list1, state.list1).as(existing,
 ```
 
 ### Determining if a value is between to other values
+
 ```
 -- data -- 
 { "v1": 2, "v2": 4, target1" : 3, "target2" : 5, "targets": [3,5] } 
@@ -309,19 +321,18 @@ false
 
 -- out --
 [
-    true,
-    false
+	true,
+	false
 ]
 ```
 
 ### Convert a list of strings to uppercase
+
 ```
 -- data -- 
 { "list": ["abc", "cde"] } 
-
 -- src --
 state.list.map(e, e.to_upper())
-
 --- out --- 
 [
 	"ABC",
@@ -330,13 +341,16 @@ state.list.map(e, e.to_upper())
 ```
 
 ### What is the optional type?
-The optional type is based on Java's java.util.Optional<T> which is a container 
-object that may or may not contain a non-null value. In CEL, if the assigned
-optional doe not contain a value, the value is removed from state.
 
-A '?' before a value marks the value as an optional type. Use
-optional.of() to set a value, and optional.none() to not set the value or
-to remove it.
+The optional type is based on Java's `java.util.Optional<T>` which is a container 
+object that may or may not contain a non-null value. In CEL, if the assigned
+optional doe not contain a value, the value is removed from `state`.
+
+A `.?` before a field marks the value as an optional type. Use
+`optional.of()` to set a value, and `optional.none()` to not set the value or
+to remove it. A `?` before a field name in a literal object constructor allows
+the field to be optionally included in the object only when the optional value
+is not `optional.none()`.
 ```
 -- data --
 { 
@@ -346,29 +360,26 @@ to remove it.
 -- src --
 {}.as(body,
 state.with({
-  ?"end_cursor": 
-    body.?data.hasNextPage.orValue(false) ?
-      body.?data.endCursor
-    :
-      optional.none()
-   ,
+	?"end_cursor": body.?data.hasNextPage.orValue(false) ?
+		body.?data.endCursor
+	:
+		optional.none()
+	,
 }))
-    
+
 -- out --
 {
 	"some_variable": "imastring"
 }
 
 -- src --
-
 {"data":{}}.as(body,
 state.with({
-  ?"end_cursor": 
-    body.?data.hasNextPage.orValue(false) ?
-      body.?data.endCursor
-    :
-      optional.none()
-   ,
+	?"end_cursor": body.?data.hasNextPage.orValue(false) ?
+		body.?data.endCursor
+	:
+		optional.none()
+	,
 }))
 
 -- out --
@@ -379,12 +390,11 @@ state.with({
 -- src --
 {"data":{"hasNextPage" : true, "endCursor": "nfnfdwo"}}.as(body,
 state.with({
-  ?"end_cursor": 
-    body.?data.hasNextPage.orValue(false) ?
-      body.?data.endCursor
-    :
-      optional.none()
-   ,
+	?"end_cursor": body.?data.hasNextPage.orValue(false) ?
+		body.?data.endCursor
+	:
+		optional.none()
+	,
 }))
 
 -- out --
@@ -392,24 +402,26 @@ state.with({
 	"end_cursor": "nfnfdwo",
 	"some_variable": "imastring"
 }
-
 ```
 
-### Use optional.none() over null
+### Use `optional.none()` over `null`
+
 The use of null requires this syntax
 ```
 state.?value && state.value != null
+```
 vs
+```
 state.?value
-
 ```
 
-Using optional.none() removes the value entirely removing the requirement to
-check for null.
+Using `optional.none()` removes the value entirely removing the requirement to
+check for `null`.
 
-### Why do I see "found no matching overload for '_?_:_' applied to '(bool, list(dyn), map(dyn, dyn))' when I have true ? []: {}"?
-The compile time type does not allow the evaluation. Use dyn() to allow
-runtime determination of type. For this specific example, dyn() is only
+### Why do I see "found no matching overload for '\_?\_:\_' applied to '(bool, list(dyn), map(dyn, dyn))' when I have true ? []: {}"?
+
+The compile time type does not allow the evaluation. Use `dyn()` conversion to
+allow runtime determination of type. For this specific example, `dyn()` is only
 required for one term. Other examples may require that both be runtime typed.
 ```
 true ? dyn([]) : {}
@@ -420,7 +432,8 @@ true ? dyn([]) : dyn({})
 ```
 
 ### Handling "found no matching overload for 'with' applied to" errors
-The work around for this is to use dyn(< the object>) to allow for runtime 
+
+The work around for this is to use `dyn(<the object>)` to allow for runtime 
 determination of type.
 
 ```
@@ -432,42 +445,40 @@ dyn(object)
 ### Handling type 'string' does not support field selection errors
 
 Occasionally the compiler will think that an object is a string and not an
-object. Use dyn(< the object>) to allow for runtime determination of type.
+object. Use `dyn(<the object>)` to allow for runtime determination of type.
 
 ### Turning array of objects with maps into a list of maps.
 
 ```
 -- data --
 [
-    {
-        "abcdef": {
-            "key1": "value1",
-            "key2": "value2"
-        },
-	    "mnopqrs": {
-            "key1": "value5",
-            "key2": "value6"
-        }
-    },
-    {
-        "ghijkl": {
-            "key3": "value3",
-            "key4": "value4"
-        }
-    }
+	{
+		"abcdef": {
+		"key1": "value1",
+		"key2": "value2"
+	},
+		"mnopqrs": {
+			"key1": "value5",
+			"key2": "value6"
+		}
+	},
+	{
+		"ghijkl": {
+			"key3": "value3",
+			"key4": "value4"
+		}
+	}
 ]
 
 -- src --
-
 zip(
-  state.map(e,e.map(key,key)).flatten(),
-  state.map(e,
-    e.map(key, e[key])
-  ).flatten()
+	state.map(e,e.map(key,key)).flatten(),
+	state.map(e,
+		e.map(key, e[key])
+	).flatten()
 )
 
 -- output --
-
 {
 	"abcdef": {
 		"key1": "value5",
@@ -483,7 +494,8 @@ zip(
 	}
 }
 ```
-### Why do some integrations use "bytes(resp.Body).decode_json()" while others use resp.Body.decode_json()
-"resp.Body.decode_json()" is preferred. In early releases of mito 
-"bytes(resp.Body).decode_json()" was the correct syntax. This is no longer the 
+### Why do some integrations use `bytes(resp.Body).decode_json()` while others use resp.Body.decode_json()?
+
+`resp.Body.decode_json()` is preferred. In early releases of mito 
+`bytes(resp.Body).decode_json()` was the required syntax. This is no longer the 
 case. 
