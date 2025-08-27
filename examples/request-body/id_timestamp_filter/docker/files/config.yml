@@ -1,0 +1,225 @@
+rules:
+  - path: /test/api/booking/history
+    methods: [POST]
+    query_params:
+      limit: 2
+    request_headers:
+# YW1pdXNlcjphbWlwYXNzd29yZA== is the user and password 'amiuser:amipassword' base64 encoded
+      Authorization: "Basic YW1pdXNlcjphbWlwYXNzd29yZA=="
+    request_body: /.*"lastTestedDate","operator":"LESSER","value":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"}]}.*/
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+            {
+              "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+              "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
+              "passenger_name":"John Apple"
+             },
+             {
+                "id":"ab75ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
+                 "passenger_name":"Jane Artichoke"
+             }
+          ],
+          "hasMoreRecords":"true",
+          "lastId": "ab75ff48-ab45-4bb5-9d02-88745177dedb"
+          }`
+          }}
+  - path: /test/api/booking/history
+    methods: [POST]
+    query_params:
+      limit: 2
+    request_headers:
+      Authorization: "Basic YW1pdXNlcjphbWlwYXNzd29yZA=="
+    request_body: "/ab75ff48-ab45-4bb5-9d02-88745177dedb/"
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"cd5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"George Doe"
+               },
+               {
+                  "id":"cd75ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Joan Doe"
+               }
+              ],
+              "hasMoreRecords":"true",
+              "lastId": "cd75ff48-ab45-4bb5-9d02-88745177dedb"
+
+          }`
+          }}
+  - path: /test/api/booking/history
+    methods: [POST]
+    query_params:
+      limit: 2
+    request_headers:
+      Authorization: "Basic YW1pdXNlcjphbWlwYXNzd29yZA=="
+    request_body: "/cd75ff48-ab45-4bb5-9d02-88745177dedb/"
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"ef5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"James Effort"
+               },
+               {
+                  "id":"ef75ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Jenny Ergo"
+               }
+              ],
+          "hasMoreRecords":"false",
+          "lastId": "ef75ff48-ab45-4bb5-9d02-88745177dedb"   
+          }`
+          }}
+
+  - path: /test/api/booking/history
+    methods: [POST]
+    query_params:
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcjphbWlwYXNzd29yZA=="
+    request_body: /.*"lastTestedDate","operator":"LESSER","value":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"}]}.*/
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"John Apple"
+               }
+              ],
+          "hasMoreRecords":"true",
+          "lastId": "ab5af2c-f477-43c4-8bdf-a00bdb939d65"         
+          }`
+          }}
+  - path: /test/api/booking/history
+    methods: [POST]
+    query_params:
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcjphbWlwYXNzd29yZA=="
+    request_body: "/ab5af2c-f477-43c4-8bdf-a00bdb939d65/"
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+               {
+                  "id":"ab75ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
+                   "passenger_name":"Jane Artichoke"
+               }
+              ],
+          "hasMoreRecords":"true",
+          "lastId": "ab75ff48-ab45-4bb5-9d02-88745177dedb"
+          }`
+          }}
+  - path: /test/api/booking/history
+    methods: [POST]
+    query_params:
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcjphbWlwYXNzd29yZA=="
+    request_body: "/ab75ff48-ab45-4bb5-9d02-88745177dedb/"
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"cd5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"George Doe"
+               }
+              ],
+          "hasMoreRecords":"true",
+          "lastId": "cd5af2c-f477-43c4-8bdf-a00bdb939d65"
+          }`
+          }}
+  - path: /test/api/booking/history
+    methods: [POST]
+    query_params:
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcjphbWlwYXNzd29yZA=="
+    request_body: "/cd5af2c-f477-43c4-8bdf-a00bdb939d65/"
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+               {
+                  "id":"cd75ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Joan Doe"
+               }
+              ],
+          "hasMoreRecords":"true",
+          "lastId": "cd75ff48-ab45-4bb5-9d02-88745177dedb"        
+          }`
+          }}
+  - path: /test/api/booking/history
+    methods: [POST]
+    query_params:
+      limit: 1
+    request_headers:
+      Authorization: "Basic YW1pdXNlcjphbWlwYXNzd29yZA=="
+    request_body: "/cd75ff48-ab45-4bb5-9d02-88745177dedb/"
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+              {
+                "id":"ef5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name":"James Effort"
+               }
+              ],
+          "hasMoreRecords":"true",
+          "lastId": "ef5af2c-f477-43c4-8bdf-a00bdb939d65"
+      
+          }`
+          }}
+  - path: /test/api/booking/history
+    methods: [POST]
+    query_params:
+      limit: 1
+    request_body: "/ef5af2c-f477-43c4-8bdf-a00bdb939d65/"
+    responses:
+      - status_code: 200
+        body: |-
+          {{ minify_json `
+          {
+          "data":[
+               {
+                  "id":"ef75ff48-ab45-4bb5-9d02-88745177dedb",
+                  "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
+                  "passenger_name":"Jenny Ergo"
+               }
+              ],
+          "hasMoreRecords":"false",
+          "lastId": "ef75ff48-ab45-4bb5-9d02-88745177dedb"
+          }`
+          }}

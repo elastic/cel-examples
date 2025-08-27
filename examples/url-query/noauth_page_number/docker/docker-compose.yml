@@ -1,0 +1,13 @@
+version: '2.3'
+services:
+  testPageNumber:
+    image: docker.elastic.co/observability/stream:v0.18.0
+    hostname: localhost
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./files:/files:ro
+    command:
+      - http-server
+      - --addr=:8090
+      - --config=/files/config.yml

@@ -1,0 +1,87 @@
+# resource.url is written automatically to state as "url" field
+resource.url: {{url}}
+config_version: 2
+interval: {{interval}}
+resource.tracer:
+  enabled: {{enable_request_tracer}}
+  filename: "../../logs/cel/http-request-trace-*.ndjson"
+  maxbackups: 5
+fields_under_root: true
+keep_null: true
+
+# An example program that manually adds authorization header to the request
+# This program pulls all the pages from an API and creates events from them.
+state:
+  limit: {{batch_size}}
+  data_path: {{data_path}}
+  sub_path: {{sub_path}}
+  username: {{username}}
+  password: {{password}}
+redact:
+  fields:
+    - password
+program: |-
+  (
+    // If next exists, the API call is controlled by the link returned from the request
+    // Else the API request is built from the url and subpath.
+    // Limit is always passed as a url query parameter
+    has(state.next) ?
+      state.with(
+        {
+          "api_call": state.next + "&" + {
+            "limit": [string(state.limit)],
+          }.format_query(),
+        }
+      )
+    :
+      state.with(
+        {
+          "api_call": state.url.trim_right("/") + "/" + state.sub_path.trim_right("/") + "?" + {
+            "limit": [string(state.limit)],
+          }.format_query(),
+        }
+      )
+  ).as(state,
+    try(
+      get_request(state.api_call).with(
+        {
+          "Header": {
+            "Authorization": ["Basic " + (state.username + ":" + state.password).base64()],
+          },
+        }
+      ).do_request(),
+      "error"
+    ).as(resp,
+      (resp.StatusCode == 200) ?
+        resp.Body.decode_json().as(body,
+          state.with(
+            {
+              // body.data and body.links.day are specific to the
+              // response returned.
+              "events": body.data.map(e, {"message": e.encode_json()}),
+              "want_more": has(body.links.next) && body.links.next != null,
+              ?"next": (has(body.links) && has(body.links.next) && body.links.next != null) ?
+                optional.of(body.links.next)
+              :
+                optional.none(),
+            }
+          )
+        )
+      :
+        // On non-200, emit an error event and stop
+        state.with(
+          {
+            "events": {
+              "error": {
+                ?"status": has(resp.StatusCode) ? optional.of(string(resp.StatusCode)) : optional.none(),
+                ?"body": has(resp.Body) ? optional.of(string(resp.Body)) : optional.none(),
+                ?"message": has(resp.error) ? optional.of(string(resp.error)) : optional.none(),
+              },
+            },
+            "want_more": false,
+            // reset next on error so it does not carry over to next periodic run
+            ?"next": optional.none(),
+          }
+        )
+    )
+  )

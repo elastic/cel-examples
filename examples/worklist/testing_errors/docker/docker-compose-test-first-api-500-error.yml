@@ -1,0 +1,16 @@
+version: '2.3'
+services:
+  server_error1:
+    image: docker.elastic.co/observability/stream:v0.18.0
+    hostname: message
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./files:/files:ro
+    environment:
+      PORT: '8090'
+      HOSTNAME: localhost
+    command:
+      - http-server
+      - --addr=:8090
+      - --config=/files/config-first-api-500-error.yml

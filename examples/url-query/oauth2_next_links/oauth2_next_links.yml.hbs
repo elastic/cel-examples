@@ -1,0 +1,67 @@
+# resource.url is written automatically to state as "url" field
+resource.url: {{url}}
+config_version: 2
+interval: {{interval}}
+resource.tracer:
+  enabled: {{enable_request_tracer}}
+  filename: "../../logs/cel/http-request-trace-*.ndjson"
+  maxbackups: 5
+fields_under_root: true
+keep_null: true
+
+# An example program that uses automatic oauth2 authorization to retrieve a token.
+# The token is automatically written to the header as Authorization: Bearer <token>
+# Using token access, this program pulls all the pages from an API that uses "next" links.
+# This program becomes more useful when it has a query by time that limits the data
+# that comes back to the latest data.
+# Note the use of state.with() around all json objects that are returned from the program.
+# This is so all the state variables are saved back for the next invocation within the periodic run.
+# Alternately, the entire program could be wrapped with a state.with()
+auth.oauth2:
+  client.id: {{client_id}}
+  client.secret: {{client_secret}}
+  token_url: {{token_url}}
+  endpoint_params:
+    grant_type: {{client_credentials}}
+state:
+  limit: {{batch_size}}
+  data_path: {{data_path}}
+  sub_path: {{sub_path}}
+# Empty redact fields declaration
+redact.fields:
+program: |-
+  state.with(
+    get_request(
+      state.url.trim_right("/") + "/" + state.sub_path.trim_right("/") + "?" + {
+        "limit": [string(state.limit)],
+        ?"cursor": has(state.next) ? optional.of([string(state.next)]) : optional.none(),
+      }.format_query()
+    )
+  ).do_request().as(resp,
+    (resp.StatusCode == 200) ?
+      resp.Body.decode_json().as(body,
+        state.with(
+          {
+            // body.data and body.links.day are specific to the
+            // response returned.
+            "events": body.data.map(e, {"message": e.encode_json()}),
+            "want_more": has(body.?links.next) && body.links.next != null,
+            // the leading ? marks this field an optional type.
+            ?"next": body.?links.next,
+          }
+        )
+      )
+    :
+      // On non-200, emit an error event and stop
+      state.with(
+        {
+          "events": {
+            "error": {
+              "status": string(resp.StatusCode),
+              "body": string(resp.Body),
+            },
+          },
+          "want_more": false,
+        }
+      )
+  )

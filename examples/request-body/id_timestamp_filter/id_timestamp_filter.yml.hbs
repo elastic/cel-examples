@@ -1,0 +1,168 @@
+# resource.url is written automatically to state as "url" field
+resource.url: {{url}}
+config_version: 2
+interval: {{interval}}
+resource.tracer:
+  enabled: {{enable_request_tracer}}
+  filename: "../../logs/cel/http-request-trace-*.ndjson"
+  maxbackups: 5
+fields_under_root: true
+keep_null: true
+
+# An example program that uses manual basic authorization.
+# This program demonstrates using minimum and maximum time ranges for queries, and a filter
+# for paging. This is based on an actual third party security detection provider API.
+# Paging is accomplished using an ID supplied by the response.
+state:
+  limit: {{batch_size}}
+  sub_path: {{sub_path}}
+  initial_interval:  {{initial_interval}}
+  user: {{user}}
+  password: {{password}}
+redact:
+  fields:
+    - password
+program: |-
+  (
+    // Variables that should be used across periodic runs are stored in the cursor.
+    // - cursor.last_runtime  the last time the periodic run was started.
+  
+    // Variables used within a periodic run that should be cleared at the end of the run
+    // - min_time_range start time for time range query
+    // - max_time_range end time for time range query
+    // - id  the last id from the last batch. Used in a filter on subsequent calls.
+  
+    // Setup logic for a periodic run.
+    // If state.min_time_range exists, then this is not the first request for this periodic run.
+  
+    // If this is first time this integration was ever run or it has never run
+    // successfully, the first request for the integration will use the initial_interval
+    // to set the min_time_range and max_time_range time for the query.
+  
+    // If there has never been a successful periodic run, which can happen if the integration
+    // is incorrectly configured, the cursor will not be set.
+  
+    // If the agent running the integration is restarted, state will be set using the configuration yaml
+    // and state.cursor will be read from disk.
+  
+    has(state.min_time_range) ?
+      state
+    :
+      state.with(
+        {
+  
+          "min_time_range": (has(state.cursor) && has(state.cursor.last_runtime)) ? state.cursor.last_runtime : (now - duration(state.initial_interval)).format("2006-01-02T15:04:05Z"),
+          "max_time_range": now.format("2006-01-02T15:04:05Z"),
+        }
+      )
+  ).as(state,
+    !has(state.id) ?
+      // The initial query for the interval does not have an ID filter
+      state.with(
+        {
+          "request_body": {
+            "filters": [
+              {
+                "field": "lastTestedDate",
+                "operator": "GREATER",
+                "value": state.min_time_range,
+              },
+              {
+                "field": "lastTestedDate",
+                "operator": "LESSER",
+                "value": state.max_time_range,
+              },
+            ],
+          },
+        }
+      )
+    :
+      // Subsequent queries have ID filters
+      state.with(
+        {
+          "request_body": {
+            "filters": [
+              {
+                "field": "lastTestedDate",
+                "operator": "GREATER",
+                "value": state.min_time_range,
+              },
+              {
+                "field": "lastTestedDate",
+                "operator": "LESSER",
+                "value": state.max_time_range,
+              },
+              {
+                "field": "id",
+                "operator": "GREATER",
+                "value": state.id,
+              },
+            ],
+          },
+        }
+      )
+  ).as(state,
+    try(
+      post_request(
+        dyn(state).url.trim_right("/") + "/" + dyn(state).sub_path.trim_right("/") + "?" + {
+          "limit": [string(dyn(state).limit)],
+        }.format_query(),
+        "application/json",
+        dyn(state).request_body.encode_json()
+      ).with(
+        {
+          "Header": {
+            "Authorization": ["Basic " + (dyn(state).user + ":" + dyn(state).password).base64()],
+            "Content-Type": ["application/json"],
+          },
+        }
+      ).do_request(),
+      "error"
+    ).as(resp,
+      (
+        (has(resp.StatusCode) && resp.StatusCode == 200) ?
+          resp.Body.decode_json().as(body,
+            state.with(
+              {
+                "events": body.data.map(e, {"message": e.encode_json()}),
+                "want_more": body.hasMoreRecords == "true",
+                "id": body.lastId,
+              }
+            )
+          )
+        :
+          // Handles non-200 statuses if the API can be reached, adn errors produced
+          // by the try(..) evaluation which will include errors produced when the API
+          // cannot be reached.
+          // Do not update the cursor. The next periodic run will use the current cursor
+          state.with(
+            {
+              "events": {
+                "error": {
+                  ?"status": has(resp.StatusCode) ? optional.of(string(resp.StatusCode)) : optional.none(),
+                  ?"body": has(resp.Body) ? optional.of(string(resp.Body)) : optional.none(),
+                  ?"message": has(resp.error) ? optional.of(string(resp.error)) : optional.none(),
+                },
+              },
+              "want_more": false,
+            }
+          ).drop(["min_time_range", "max_time_range", "id"])
+      ).as(state,
+        (has(state.want_more) && state.want_more) ?
+          state
+        : // If there were errors, max_time_range is already dropped.
+        // if there were no errors, update the cursor and clear
+        // min_time_range, max_time_range and id
+        has(state.max_time_range) ?
+          state.with(
+            {
+              "cursor": {
+                "last_runtime": state.max_time_range,
+              },
+            }
+          ).drop(["min_time_range", "max_time_range", "id"])
+        :
+          state
+      )
+    )
+  )

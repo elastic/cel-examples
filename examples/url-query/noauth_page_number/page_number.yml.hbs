@@ -1,0 +1,63 @@
+# is written automatically to state as "url" field
+resource.url: {{url}}
+config_version: 2
+interval: {{interval}}
+resource.tracer:
+  enabled: {{enable_request_tracer}}
+  filename: "../../logs/cel/http-request-trace-*.ndjson"
+  maxbackups: 5
+fields_under_root: true
+keep_null: true
+
+# An example program that user page numbers to pull all the pages from an API and create events.
+# This program becomes more useful when it has a query by time that limits the data
+# that comes back to the latest data.
+# This example does not use a state.cursor to save state across integration restarts.
+state:
+  limit: {{batch_size}}
+  data_path: {{data_path}}
+  sub_path: {{sub_path}}
+# Empty redact fields declaration
+redact.fields:
+program: |-
+  state.with(
+    get_request(
+      // Build the URL with page and per_page using format_query()
+      // Initial query in a periodic run has no page number.
+      state.url.trim_right("/") + "/" + state.sub_path.trim_right("/") + "?" + {
+        "limit": [string(state.limit)],
+        ?"page": has(state.page) ? optional.of([string(state.page)]) : optional.none(),
+      }.format_query()
+    )
+  ).do_request().as(resp,
+    (resp.StatusCode == 200) ?
+      resp.Body.decode_json().as(body,
+        state.with(
+          {
+            "events": body.data.map(e, {"message": e.encode_json()}),
+            "want_more": has(body.more) && body.more == true,
+            // Note that if want_more is false, we unset the page field so it will
+            // not be saved in the state object.
+            ?"page": (has(body.more) && body.more == true) ?
+              optional.of(int(state.?page.orValue("1")) + 1)
+            :
+              optional.none(),
+          }
+        )
+      )
+    :
+      // On non-200, emit an error event and stop
+      // On errors, the last valid state of the state object will be kept in memory
+      // Note the use of state.with
+      state.with(
+        {
+          "events": {
+            "error": {
+              "status": string(resp.StatusCode),
+              "body": string(resp.Body),
+            },
+          },
+          "want_more": false,
+        }
+      )
+  )
