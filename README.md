@@ -16,15 +16,16 @@ As a non-turing complete functional language, the structure of CEL programs can
 seem foreign to procedural or object-oriented programmers. For more information 
 on CEL and mito extensions, see the official documentation:
 [Google CEL](https://github.com/google/CEL-spec/blob/master/doc/langdef.md),
-[mito CEL extension](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-CEL). 
+[mito CEL extension](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-cel).
 
 ### Examples
 The examples directory has functioning CEL programs. Each example has a 
-docker-compose file to run a mock server to server an API so the example can
-be run in realistically. The README.md explains how to use run the examples.
+docker-compose file to run a mock server to serve an API so the example can
+be run in realistically. The [README.md](./examples/README.md) explains how to 
+run the examples.
 
 ### FAQs
-There are several files in the FAQS directory with how-tos on how to write CEL
+There are several files in the FAQs directory with how-tos on how to write CEL
 code, structure CEL programs for handling API request errors, how to fix
 compile errors and set up an editor for CEL. Many code examples for the mito
 extensions exist in the mito repository testdata directory
