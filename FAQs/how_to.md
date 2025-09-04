@@ -15,14 +15,14 @@ for the beats version you are using will have the version of mito that Filebeat
 was built with. https://github.com/elastic/beats/blob/main/go.mod
 
 Documentation for the mito CEL extensions available in Filebeat can be found
-[here](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-CEL).
+[here](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-cel).
 Documentation for Google CEL can be found [here](https://github.com/google/CEL-spec/blob/master/doc/langdef.md).
 
 ### What is the relationship between mito, CEL programs and Filebeat.
 
 CEL programs are run by Filebeat using the cel-go CEL implementation and the
 mito extension library. Filebeat will keep running (invoking or evaluating) the
-CEL program until the `state` variable `want_more` is false. The evaluation
+CEL program until the `state` object's `want_more` variable is false. The evaluation
 of `want_more` occurs outside the CEL program and outside mito. Using mito to
 run the CEL program is equivalent to running a single invocation(evaluation) of
 the CEL program by Filebeat.
@@ -40,6 +40,12 @@ expected fields. This occurs if returned object is
 is not created with the `state.with(...)` syntax, or if the developer has not
 explicitly set fields in the returned object. Best practice is to keep fields 
 that should be persisted across periodic runs in the cursor object.
+
+A typical error for missing fields looks like this:
+```
+failed eval: ERROR: :21:50: no such key: limit
+```
+This error indicates that the field `limit` is missing.
 
 ### Why is CEL preferred over HTTP JSON?
 
