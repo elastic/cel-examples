@@ -47,31 +47,26 @@ if ! command -v yq >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! command -v mustache >/dev/null 2>&1; then
-  echo "Error: 'mustache' is required but not installed. Install with: npm install -g mustache"
-  exit 1
-fi
-
-if ! command -v perl >/dev/null 2>&1; then
-  echo "Error: 'perl' is required but not installed."
+if ! command -v handlebars >/dev/null 2>&1; then
+  echo "Error: 'handlebars' is required but not installed. Install with: npm install -g handlebars"
   exit 1
 fi
 
 if ! command -v mito >/dev/null 2>&1; then
-  echo "Error: 'mito' is required but not installed."
+  echo "Error: 'mito' is required but not installed. Install with 'go install github.com/elastic/mito/cmd/mito@<version>'"
   exit 1
 fi
 
-# Convert YAML to JSON so mustache can use it
+SCRIPT_LOC=$(dirname -- "$0")
+# Convert YAML to JSON so handlebars can use it
 TMP_JSON=$(mktemp)
 yq -o=json '.' "$VARIABLES_FILE" > "$TMP_JSON"
 
 # Render template
 # replace {{ }} handlebars variables in the template file with the
-# definitions in the json variables file.
-# mustache encodes urls to hex. Pipe to perl to decode them.
-# Pipe to yq to merge the result into the cel input file for use by filebeat
-mustache "$TMP_JSON" "$TEMPLATE_FILE" | perl -CSD -pe 's/&#x([0-9a-fA-F]+);/chr(hex($1))/ge' | yq eval-all '
+# definitions in the json variables file. Then add the input
+# data to the filebeat input file skeleton and write out the filebeat input file
+node ${SCRIPT_LOC}/render.js "$TMP_JSON" "$TEMPLATE_FILE" | yq eval-all '
   select(fileIndex == 0) as $patch |
   select(fileIndex == 1) as $base |
   ($base.[] | to_entries | map(select(.value.type == "cel")) | .[0].key) as $i |
