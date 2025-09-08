@@ -8,6 +8,7 @@ Each example has its own directory with an agent configuration file
 ```
 ├── README.md       # This file
 ├── beats-config-from-agent-config-template.sh   #script
+├── render.js      #script
 ├── filebeat-cel-input-base.yml     #File for the filebeat cel-input file to
 │                                     which the cel progam will be added.
 │                                     Can be any name.                                     
@@ -37,12 +38,12 @@ which is useful for debugging compilation and running errors before running the
 file in filebeat.
 
 The script:
-1. Uses mustache to replace handlebar variables in the *.yml.hbs file
-with the concrete values from the YAML file that contains the  replacement 
-values for the handlebar variables. 
+1. Depends on the render.js script that uses handlebars to replace 
+handlebar variables in the *.yml.hbs file with the concrete values from the YAML
+file that contains the replacement values for the templated variables. 
 2. Adds the resulting state and program keys to the partial filebeat cel input 
 file to create the complete filebeat cel input file. The location where the 
-filebeat cel input is configurable in the filebeat.ymml configuration file.
+filebeat cel input is configurable in the filebeat.yml configuration file.
 The filebeat.yml in each example configures the inputs to be in 
 ${path.config}/inputs.d/*.yml. You may change this.
 3. If -m is supplied to run with mito, the script parses the filebeat cel input
