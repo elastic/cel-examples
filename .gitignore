@@ -420,3 +420,6 @@ FodyWeavers.xsd
 # Ignore data and out directories from running filebeat
 **/data/
 **/out/
+
+# Ignore generated files
+**/inputs.d/
