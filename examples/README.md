@@ -102,13 +102,21 @@ were made to the API server.
 ```
 ## Creating your own examples or test of new cel scripts
 
-The test/example_test directory has a very simple cel script to test the
-local setup. This directory for this example or for any example in the repo can
-be copied and used as a basis for your own scripts. 
+We welcome new examples. Feel free to create your own and add them to the
+repository.
+
+To create a new example, copy one of the existing examples as a basis for the new
+example. Then
+1. Update the *.hbs file with the new cel program. 
+2. Update 'variables.yml' to initialize the state fields for your new CEL program.
+3. Update the config file for the mock server: 'docker/file/config.yml'
+4. Clear the inputs.d directory and the /data directory if there is data there.
+
 
 ### Values that you might need or want to change.
-1. The port number for all examples is 8090. Therefore you can only run one
-example docker container at a time. Synsc changed port numbers in 
-./docker/files/config.yml and varibles.yml
+1. The port number for all examples is 8090. Only one
+example docker container can be run at a time. To run more than one docker 
+container at a time, change the port number in
+./docker/files/config.yml and variables.yml to an unused port.
 2. The name of mock api server is defined in ./docker/docker-compose.yml under
 services. This name is the name of the container in docker.
