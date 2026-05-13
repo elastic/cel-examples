@@ -1,0 +1,26 @@
+format_version: 3.3.2
+name: cel_examples
+title: cel-examples
+version: 0.1.0
+source:
+  license: Apache-2.0
+description: Demo package for Elastic Agent CEL input patterns.
+type: integration
+categories:
+  - custom
+conditions:
+  kibana:
+    version: ^9.0.0
+  elastic:
+    subscription: basic
+policy_templates:
+  - name: cel_examples
+    title: cel-examples
+    description: Demo CEL input patterns with mock APIs.
+    inputs:
+      - type: cel
+        title: Collect CEL example data
+        description: Collect data from the selected CEL example mock APIs.
+owner:
+  github: elastic/security-service-integrations
+  type: elastic
