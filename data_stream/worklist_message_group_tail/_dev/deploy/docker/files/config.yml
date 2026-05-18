@@ -35,7 +35,6 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
-
   - path: /v0/message-groups
     methods: ['GET']
     query_params:
@@ -72,7 +71,6 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
-
   - path: /v0/message-groups
     methods: ['GET']
     query_params:
@@ -98,7 +96,6 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
-
   - path: /v0/messages/9c426680-5cdf-4283-adbd-d79ba0e52434
     methods: ['GET']
     request_headers:
