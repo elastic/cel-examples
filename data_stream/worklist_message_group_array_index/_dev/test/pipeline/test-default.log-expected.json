@@ -1,0 +1,22 @@
+{
+    "expected": [
+        {
+            "worklist_message_group_array_index": {
+                "id": "9c426680-5cdf-4283-adbd-d79ba0e52434",
+                "subject": "Urgent: Wire transfer",
+                "sender": {
+                    "email": "bob.demo@gmail.com"
+                }
+            },
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "original": "{\"id\":\"9c426680-5cdf-4283-adbd-d79ba0e52434\",\"subject\":\"Urgent: Wire transfer\",\"sender\":{\"email\":\"bob.demo@gmail.com\"}}"
+            },
+            "tags": [
+                "preserve_original_event"
+            ]
+        }
+    ]
+}

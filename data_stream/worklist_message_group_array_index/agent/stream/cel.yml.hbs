@@ -1,6 +1,11 @@
 config_version: 2
 interval: {{interval}}
 resource.url: {{url}}
+resource.tracer:
+  enabled: {{enable_request_tracer}}
+  filename: "../../logs/cel/http-request-trace-*.ndjson"
+  maxbackups: 5
+
 state:
   page_size: {{page_size}}
   offset: 0
@@ -9,13 +14,13 @@ state:
 redact:
   fields:
     - api_key
-# This program writes a set of message group ids into a worklist, then loops over the ids
-# querying each message-group id to retrieve the list of messages for each group.
-# When 'worklist' is empty, this triggers another API call to fill the worklist
-# with more message-group ids. The pattern is a single call to the message-groups
-# API followed by a multiple calls to the message API to retrieve messages.
-# This example uses array indexing into the worklist.
 program: |-
+  // This program writes a set of message group ids into a worklist, then loops over the ids
+  // querying each message-group id to retrieve the list of messages for each group.
+  // When 'worklist' is empty, this triggers another API call to fill the worklist
+  // with more message-group ids. The pattern is a single call to the message-groups
+  // API followed by a multiple calls to the message API to retrieve messages.
+  // This example uses array indexing into the worklist.
   (
     // if the first api calls to message-group have filled 'worklist'
     // return the state and skip calls to message-group API.
@@ -135,12 +140,12 @@ program: |-
               },
             },
             "want_more": false,
-            "worklist" : []
+            "worklist": []
           }
         )
       :
         {
-          "events": [],
+          "events": [{"message": "empty_events_placeholder"}],
           "want_more": false,
           // note the persistence of offset between periodic runs.
           "offset": 0,
@@ -150,3 +155,21 @@ program: |-
         }
     )
   )
+tags:
+{{#if preserve_original_event}}
+  - preserve_original_event
+{{/if}}
+{{#each tags as |tag|}}
+  - {{tag}}
+{{/each}}
+{{#contains "forwarded" tags}}
+publisher_pipeline.disable_host: true
+{{/contains}}
+processors:
+- drop_event:
+    when:
+      equals:
+        message: empty_events_placeholder
+{{#if processors}}
+{{processors}}
+{{/if}}

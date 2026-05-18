@@ -1,0 +1,3 @@
+- name: worklist_message_group_array_index
+  type: flattened
+  description: Parsed API response object collected by the Message Group Array Index example stream.
