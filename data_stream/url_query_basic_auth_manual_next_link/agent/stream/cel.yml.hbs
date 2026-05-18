@@ -1,19 +1,14 @@
-# resource.url is written automatically to state as "url" field
-resource.url: {{url}}
 config_version: 2
 interval: {{interval}}
+# resource.url is written automatically to state as "url" field
+resource.url: {{url}}
 resource.tracer:
   enabled: {{enable_request_tracer}}
   filename: "../../logs/cel/http-request-trace-*.ndjson"
   maxbackups: 5
-fields_under_root: true
-keep_null: true
 
-# An example program that manually adds authorization header to the request
-# This program pulls all the pages from an API and creates events from them.
 state:
   limit: {{batch_size}}
-  data_path: {{data_path}}
   sub_path: {{sub_path}}
   username: {{username}}
   password: {{password}}
@@ -21,6 +16,8 @@ redact:
   fields:
     - password
 program: |-
+  // An example program that manually adds authorization header to the request
+  // This program pulls all the pages from an API and creates events from them.
   (
     // If next exists, the API call is controlled by the link returned from the request
     // Else the API request is built from the url and subpath.
@@ -28,7 +25,7 @@ program: |-
     has(state.next) ?
       state.with(
         {
-          "api_call": state.next + "&" + {
+          "api_call": state.url.trim_right("/") + state.next + "&" + {
             "limit": [string(state.limit)],
           }.format_query(),
         }
@@ -52,7 +49,7 @@ program: |-
       ).do_request(),
       "error"
     ).as(resp,
-      (resp.StatusCode == 200) ?
+      (has(resp.StatusCode) && resp.StatusCode == 200) ?
         resp.Body.decode_json().as(body,
           state.with(
             {
@@ -85,3 +82,17 @@ program: |-
         )
     )
   )
+tags:
+{{#if preserve_original_event}}
+  - preserve_original_event
+{{/if}}
+{{#each tags as |tag|}}
+  - {{tag}}
+{{/each}}
+{{#contains "forwarded" tags}}
+publisher_pipeline.disable_host: true
+{{/contains}}
+{{#if processors}}
+processors:
+{{processors}}
+{{/if}}
