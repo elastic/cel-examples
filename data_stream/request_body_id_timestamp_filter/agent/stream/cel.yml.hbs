@@ -1,18 +1,12 @@
-# resource.url is written automatically to state as "url" field
-resource.url: {{url}}
 config_version: 2
 interval: {{interval}}
+# resource.url is written automatically to state as "url" field
+resource.url: {{url}}
 resource.tracer:
   enabled: {{enable_request_tracer}}
   filename: "../../logs/cel/http-request-trace-*.ndjson"
   maxbackups: 5
-fields_under_root: true
-keep_null: true
 
-# An example program that uses manual basic authorization.
-# This program demonstrates using minimum and maximum time ranges for queries, and a filter
-# for paging. This is based on an actual third party security detection provider API.
-# Paging is accomplished using an ID supplied by the response.
 state:
   limit: {{batch_size}}
   sub_path: {{sub_path}}
@@ -23,6 +17,10 @@ redact:
   fields:
     - password
 program: |-
+  // An example program that uses manual basic authorization.
+  // This program demonstrates using minimum and maximum time ranges for queries, and a filter
+  // for paging. This is based on an actual third party security detection provider API.
+  // Paging is accomplished using an ID supplied by the response.
   (
     // Variables that should be used across periodic runs are stored in the cursor.
     // - cursor.last_runtime  the last time the periodic run was started.
@@ -166,3 +164,17 @@ program: |-
       )
     )
   )
+tags:
+{{#if preserve_original_event}}
+  - preserve_original_event
+{{/if}}
+{{#each tags as |tag|}}
+  - {{tag}}
+{{/each}}
+{{#contains "forwarded" tags}}
+publisher_pipeline.disable_host: true
+{{/contains}}
+{{#if processors}}
+processors:
+{{processors}}
+{{/if}}
