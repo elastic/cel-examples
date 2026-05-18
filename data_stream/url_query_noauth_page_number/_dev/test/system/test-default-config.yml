@@ -1,0 +1,12 @@
+input: cel
+service: url_query_noauth_page_number
+vars: ~
+data_stream:
+  vars:
+    url: "http://{{Hostname}}:{{Port}}/test/api"
+    enable_request_tracer: true
+    batch_size: 2
+    sub_path: booking
+    preserve_original_event: true
+assert:
+  hit_count: 6

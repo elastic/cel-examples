@@ -1,0 +1,73 @@
+title: URL Query No Auth Page Number
+type: logs
+streams:
+  - input: cel
+    title: URL Query No Auth Page Number
+    description: Collect booking records from a page-number API without authentication.
+    template_path: cel.yml.hbs
+    vars:
+      - name: url
+        type: url
+        title: URL
+        description: Base URL for the example API.
+        required: true
+        show_user: true
+        multi: false
+        default: http://localhost:8090/test/api
+      - name: interval
+        type: text
+        title: Interval
+        description: Duration between requests to the API.
+        required: true
+        show_user: true
+        multi: false
+        default: 1m
+      - name: batch_size
+        type: integer
+        title: Batch Size
+        description: Maximum records to request per page.
+        required: true
+        show_user: false
+        multi: false
+        default: 2
+      - name: sub_path
+        type: text
+        title: Sub Path
+        description: API path below the shared URL.
+        required: true
+        show_user: false
+        multi: false
+        default: booking
+      - name: enable_request_tracer
+        type: bool
+        title: Enable request tracing
+        description: The request tracer logs requests and responses to the agent's local file-system for debugging.
+        required: false
+        show_user: false
+        multi: false
+        default: false
+      - name: preserve_original_event
+        type: bool
+        title: Preserve original event
+        description: Preserves a raw copy of the original event in event.original.
+        required: false
+        show_user: true
+        multi: false
+        default: false
+      - name: tags
+        type: text
+        title: Tags
+        description: Tags for the data stream.
+        required: false
+        show_user: false
+        multi: true
+        default:
+          - forwarded
+          - cel_examples-url_query_noauth_page_number
+      - name: processors
+        type: yaml
+        title: Processors
+        description: Processors to apply before ingest pipelines.
+        required: false
+        show_user: false
+        multi: false

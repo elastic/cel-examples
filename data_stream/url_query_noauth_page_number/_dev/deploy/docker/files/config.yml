@@ -74,7 +74,6 @@ rules:
             "more": false
           }`
           }}
-
   - path: /test/api/booking
     methods: [GET]
     query_params:
@@ -92,7 +91,7 @@ rules:
                 "passenger_name":"John Apple"
               }
             ],
-            "more": true         
+            "more": true
           }`
           }}
   - path: /test/api/booking
@@ -152,7 +151,7 @@ rules:
                 "passenger_name":"Joan Doe"
               }
             ],
-           "more": true          
+           "more": true
           }`
           }}
   - path: /test/api/booking
@@ -172,7 +171,7 @@ rules:
                 "passenger_name":"James Effort"
                }
             ],
-           "more": true          
+           "more": true
           }`
           }}
   - path: /test/api/booking
@@ -192,7 +191,7 @@ rules:
                 "passenger_name":"Jenny Ergo"
               }
             ],
-            "more": false         
+            "more": false
             }
           }`
           }}
@@ -236,6 +235,6 @@ rules:
                 "passenger_name":"John Apple"
               }
             ],
-            "more": true         
+            "more": true
           }`
           }}
