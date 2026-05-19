@@ -1,0 +1,3 @@
+- name: worklist_testing_errors
+  type: flattened
+  description: Parsed API response object collected by the Worklist Testing Errors example stream.

@@ -1,0 +1,42 @@
+# Exercise the CEL program's error handling when the message-groups list phase returns HTTP 500.
+
+[!exec:bash] skip 'bash is required'
+[!exec:celfmt] skip 'celfmt is required'
+[!exec:mito] skip 'mito is required'
+[!exec:jq] skip 'jq is required'
+[!exec:docker] skip 'docker is required'
+
+exec bash test_cel_state.sh
+
+-- test_cel_state.sh --
+#!/usr/bin/env bash
+set -euo pipefail
+
+compose_dir="${DATA_STREAM_ROOT}/_dev/deploy/docker"
+project="worklist-testing-errors-${RANDOM}"
+docker compose -f "${compose_dir}/docker-compose.yml" -p "${project}" up -d
+trap 'docker compose -f "${compose_dir}/docker-compose.yml" -p "${project}" down --volumes' EXIT
+
+container="$(docker compose -f "${compose_dir}/docker-compose.yml" -p "${project}" ps -q worklist_testing_errors)"
+port="$(docker port "${container}" 8090/tcp | cut -d: -f2)"
+url="http://127.0.0.1:${port}/list-error"
+celfmt -extract -i "${DATA_STREAM_ROOT}/agent/stream/cel.yml.hbs" > program.cel
+
+cat > state.json <<JSON
+{
+  "url": "${url}",
+  "page_size": 1,
+  "offset": 0,
+  "initial_interval": "24h",
+  "api_key": "xxxx"
+}
+JSON
+
+mito -data state.json program.cel > got.json
+jq -s 'last' got.json > last.json
+
+jq -e '.want_more == false' last.json
+jq -e '.offset == 0' last.json
+jq -e '.events.error.code == "500"' last.json
+jq -e '.events.error.message | contains("server error")' last.json
+jq -e 'has("cursor") | not' last.json
