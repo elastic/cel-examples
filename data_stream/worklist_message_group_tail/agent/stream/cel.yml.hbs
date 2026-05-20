@@ -15,12 +15,15 @@ redact:
   fields:
     - api_key
 program: |-
-  // This program writes a set of message group ids into a worklist, then loops over the ids
+  // This is an example of creating a worklist from one API call that then gets
+  // worked off in recurring invocations of the program.
+  //
+  // It writes a set of message group ids into a worklist, then loops over the ids
   // querying each message-group id to retrieve the list of messages for each group.
   // When 'worklist' is empty, this triggers another API call to fill the worklist
   // with more message-group ids. The pattern is a single call to the message-groups
   // API followed by a multiple calls to the message API to retrieve messages.
-  // This example uses front() and tail() to pop values off the worklist
+  // This example uses front() and tail() to pop values off the worklist.
   (
     // if the first api calls to message-group have filled 'worklist'
     // return the state and skip calls to message-group API.

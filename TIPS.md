@@ -1,59 +1,52 @@
 # CEL tips
 
-This document collects notes, recommendations, troubleshooting tips, and small
-CEL examples for Elastic integrations. It is organized by how the material is
-used:
+For an accessible introduction to CEL for the CEL Input, read this blog post:
+[Common Expression Language (CEL): How the CEL input improves data collection in Elastic Agent integrations](https://www.elastic.co/search-labs/blog/common-expression-language-elasticsearch).
 
-- Concepts explain how CEL, mito, and Filebeat fit together.
-- Recommended practices describe preferred patterns.
-- Troubleshooting sections explain common runtime and compile-time problems.
-- Cookbook sections provide small CEL fragments for common tasks.
+Below you'll find some additional tips covering concepts, recommended
+practices, troublshooting and cookbook-style solutions for common tasks:
+
+- [Concepts](#concepts)
+  - [Optional values](#optional-values)
+  - [Number handling](#number-handling)
+- [Recommended practices](#recommended-practices)
+  - [Prefer the CEL Input over the HTTP JSON Input](#prefer-the-cel-input-over-the-http-json-input)
+  - [Compile and test CEL without Filebeat or an integration](#compile-and-test-cel-without-filebeat-or-an-integration)
+  - [Prefer `optional.none()` to `null`](#prefer-optionalnone-to-null)
+  - [Plan state handling after errors](#plan-state-handling-after-errors)
+  - [Handle requests that fail without a status code](#handle-requests-that-fail-without-a-status-code)
+- [Troubleshooting](#troubleshooting)
+  - [Fields are missing on the second periodic run](#fields-are-missing-on-the-second-periodic-run)
+  - [Errors and `want_more`](#errors-and-want_more)
+  - [HTTP request fails completely with no HTTP status code](#http-request-fails-completely-with-no-http-status-code)
+  - [`timestamp : no such overload: timestamp(double)`](#timestamp--no-such-overload-timestampdouble)
+  - [`found no matching overload for '_?_:_'`](#found-no-matching-overload-for-___)
+  - [`found no matching overload for 'with' applied to`](#found-no-matching-overload-for-with-applied-to)
+  - [Type `string` does not support field selection](#type-string-does-not-support-field-selection)
+- [Cookbook](#cookbook)
+  - [Type conversion and object shaping](#type-conversion-and-object-shaping)
+    - [Convert an array of numbers to an array of strings](#convert-an-array-of-numbers-to-an-array-of-strings)
+    - [Convert a list of strings to uppercase](#convert-a-list-of-strings-to-uppercase)
+    - [Create a map of numbers](#create-a-map-of-numbers)
+    - [Merge an array of maps into a single map](#merge-an-array-of-maps-into-a-single-map)
+  - [Maps and membership checks](#maps-and-membership-checks)
+    - [Check whether a map contains a key](#check-whether-a-map-contains-a-key)
+    - [Check whether a list contains a value](#check-whether-a-list-contains-a-value)
+  - [List and set operations](#list-and-set-operations)
+    - [Create a sorted deduplicated list](#create-a-sorted-deduplicated-list)
+    - [Return values from the second list that do not occur in the first list](#return-values-from-the-second-list-that-do-not-occur-in-the-first-list)
+    - [Find the intersection of two lists](#find-the-intersection-of-two-lists)
+    - [Add two lists](#add-two-lists)
+    - [Add two lists and sort the result](#add-two-lists-and-sort-the-result)
+    - [Determine whether a value is between two other values](#determine-whether-a-value-is-between-two-other-values)
+- [Compatibility notes](#compatibility-notes)
+  - [`bytes(resp.Body).decode_json()` and `resp.Body.decode_json()`](#bytesrespbodydecode_json-and-respbodydecode_json)
 
 ## Concepts
 
-### Google CEL and Elastic CEL
-
-The Elastic [`mito`](https://github.com/elastic/mito) project extends Google CEL
-with more functions, including functions that support HTTP requests. Written in
-Go, mito uses the [`cel-go`](https://github.com/google/cel-go) libraries. Every
-function in cel-go is available in mito.
-
-Each version of mito is built on a specific version of cel-go. Each version of
-Filebeat, which runs the mito library, is bound to a specific version of mito.
-As cel-go evolves, mito evolves as well. To get the latest mito version
-available for the CEL input, use the latest version of Filebeat or the latest
-available Elastic Agent. The Beats
-[`go.mod`](https://github.com/elastic/beats/blob/main/go.mod) file has the
-version of mito that Filebeat was built with.
-
-Documentation for the mito CEL extensions available in Filebeat can be found in
-the [Filebeat CEL input documentation](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-cel).
-Documentation for Google CEL can be found in the
-[CEL language definition](https://github.com/google/CEL-spec/blob/master/doc/langdef.md).
-
-### mito, CEL programs, and Filebeat
-
-CEL programs are run by Filebeat using the cel-go CEL implementation and the
-mito extension library. Filebeat keeps running, invoking, or evaluating the CEL
-program until the `state` object's `want_more` variable is false. The evaluation
-of `want_more` occurs outside the CEL program and outside mito. Using mito to
-run the CEL program is equivalent to running a single invocation of the CEL
-program by Filebeat.
-
-### Repeated execution and loops
-
-CEL is a non-Turing complete language. It does not support unbounded loops. The
-use of `want_more` to continually loop over the program until `want_more` is
-false is controlled by Filebeat or mito. Looping can be emulated by using
-`want_more`, even in more complex programs.
-
-[`message_group_tail.yml.hbs`](examples/worklist/message_group/message_group_tail.yml.hbs)
-shows an example of creating a worklist from one API call that then gets worked
-off in recurring invocations of the program.
-
 ### Optional values
 
-The optional type is based on Java's `java.util.Optional<T>`, which is a
+The optional type is similar to Java's `java.util.Optional<T>`, which is a
 container object that may or may not contain a non-null value. In CEL, if the
 assigned optional does not contain a value, the value is removed from `state`.
 
@@ -144,7 +137,7 @@ from a CEL evaluation.
 
 ## Recommended practices
 
-### Prefer CEL over HTTP JSON
+### Prefer the CEL Input over the HTTP JSON Input
 
 CEL is the preferred input method, as HTTP JSON is planned to be phased out in
 favor of CEL. The reasons for this are:
@@ -157,7 +150,7 @@ favor of CEL. The reasons for this are:
    integrations.
 3. CEL is easier to debug than HTTP JSON.
 
-### Compile and test CEL without Filebeat
+### Compile and test CEL without Filebeat or an integration
 
 [`mito`](https://github.com/elastic/mito) can be used to create a `mito`
 executable that can compile and run CEL programs from the command line.
@@ -175,10 +168,10 @@ go install github.com/efd6/miko
 CEL program. If `celfmt` is installed, `miko` can use it to format the code in
 the playground.
 
-Each of these tools is versioned, as is Filebeat. Running different versions of
-the tools on the same program may result in different behavior. Try to use the
-versions required by the minimum version of Filebeat that is being targeted. The
-Beats [`go.mod`](https://github.com/elastic/beats/blob/main/go.mod) file has the
+Each of these tools is versioned. Running different versions of the tools on
+the same program may result in different behavior. Try to use the versions
+required by the minimum version of Filebeat that is being targeted. The Beats
+[`go.mod`](https://github.com/elastic/beats/blob/main/go.mod) file has the
 version of mito that Filebeat was built with. Make sure that you are using the
 correct tag for the Beats repository.
 
@@ -233,8 +226,8 @@ applicable to every program design.
 1. Use the [`try`](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Try-Try)
    function to detect request failures. On failure, set the state according to
    one of the strategies suggested for non-2xx responses. The
-   [`url-query`](examples/url-query/basic_auth_manual_next_link/basic_auth_manual_next.yml.hbs)
-   example shows the use of the `try` function.
+   `url_query_basic_auth_manual_next_link` example demonstrates use of the
+   `try` function.
 2. Without the `try` function, the CEL program will automatically retry the API
    indefinitely. See the documentation for
    [`max_retries`](https://www.elastic.co/docs/reference/beats/filebeat/elasticsearch-output#_max_retries).
@@ -314,9 +307,13 @@ typed.
 
 ```
 true ? dyn([]) : {}
+```
 or
+```
 true ? [] : dyn({})
+```
 or
+```
 true ? dyn([]) : dyn({})
 ```
 
@@ -335,18 +332,6 @@ dyn(object)
 
 Occasionally the compiler will think that an object is a string and not an
 object. Use `dyn(<the object>)` to allow runtime determination of type.
-
-## Finding examples
-
-### Real-world examples
-
-The [elastic/integrations repository](https://github.com/elastic/integrations/tree/main/packages)
-has over 150 integrations, many written using CEL. To find an integration using
-CEL, look for files called `cel.yml.hbs` under `<datastream>/agent`.
-
-Elastic's use of CEL has evolved over time, so some examples more closely align
-with current practice than others. The use of `tail()` for worklists is recent.
-Many integrations still use array indexing for worklists.
 
 ## Cookbook
 
