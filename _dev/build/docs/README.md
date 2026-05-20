@@ -44,8 +44,8 @@ elastic-package test pipeline
 Run the system tests to run the full integration against mock APIs.
 
 ```sh
-elastic-package test system
-elastic-package test system --data-streams STREAM_NAME --defer-cleanup 5m
+elastic-package test -v system
+elastic-package test -v system --data-streams STREAM_NAME --defer-cleanup 5m
 ```
 
 You can select a specific data stream with the `--data-streams` option, and use
@@ -69,6 +69,9 @@ tests, but with different URL paths.
 
 For an accessible introduction to CEL for the CEL Input read the blog post
 [Common Expression Language (CEL): How the CEL input improves data collection in Elastic Agent integrations](https://www.elastic.co/search-labs/blog/common-expression-language-elasticsearch).
+
+Many code examples covering the Mito extensions can be found in the `mito`
+repository's [`testdata` directory](https://github.com/elastic/mito/tree/dev/testdata).
 
 <details>
 <summary>Expand to read additional tips.</summary>
