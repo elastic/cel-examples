@@ -63,53 +63,73 @@ to set a value, and `optional.none()` to not set the value or to remove it. A
 optionally included in the object only when the optional value is not
 `optional.none()`.
 
-```
--- data --
-{
+With no response body data, the optional field is not added to `state`:
+
+```shell
+mito -data <(echo '{
   "some_variable": "imastring"
-}
+}') <(echo '
+  {}.as(body,
+    state.with({
+      ?"end_cursor": body.?data.hasNextPage.orValue(false) ?
+        body.?data.endCursor
+      :
+        optional.none()
+      ,
+    })
+  )
+')
+```
 
--- src --
-{}.as(body,
-state.with({
-	?"end_cursor": body.?data.hasNextPage.orValue(false) ?
-		body.?data.endCursor
-	:
-		optional.none()
-	,
-}))
-
--- out --
+```json
 {
 	"some_variable": "imastring"
 }
+```
 
--- src --
-{"data":{}}.as(body,
-state.with({
-	?"end_cursor": body.?data.hasNextPage.orValue(false) ?
-		body.?data.endCursor
-	:
-		optional.none()
-	,
-}))
+With an empty `data` object, the optional field is still not added:
 
--- out --
+```shell
+mito -data <(echo '{
+  "some_variable": "imastring"
+}') <(echo '
+  {"data":{}}.as(body,
+    state.with({
+      ?"end_cursor": body.?data.hasNextPage.orValue(false) ?
+        body.?data.endCursor
+      :
+        optional.none()
+      ,
+    })
+  )
+')
+```
+
+```json
 {
 	"some_variable": "imastring"
 }
+```
 
--- src --
-{"data":{"hasNextPage" : true, "endCursor": "nfnfdwo"}}.as(body,
-state.with({
-	?"end_cursor": body.?data.hasNextPage.orValue(false) ?
-		body.?data.endCursor
-	:
-		optional.none()
-	,
-}))
+When the optional value exists, it is added to `state`:
 
--- out --
+```shell
+mito -data <(echo '{
+  "some_variable": "imastring"
+}') <(echo '
+  {"data":{"hasNextPage" : true, "endCursor": "nfnfdwo"}}.as(body,
+    state.with({
+      ?"end_cursor": body.?data.hasNextPage.orValue(false) ?
+        body.?data.endCursor
+      :
+        optional.none()
+      ,
+    })
+  )
+')
+```
+
+```json
 {
 	"end_cursor": "nfnfdwo",
 	"some_variable": "imastring"
@@ -334,14 +354,15 @@ Many integrations still use array indexing for worklists.
 
 #### Convert an array of numbers to an array of strings
 
+```shell
+mito -data <(echo '{
+  "list": [1,2,3]
+}') <(echo '
+  state.list.map(num, string(num))
+')
 ```
--- data --
-{ "list": [1,2,3] }
 
--- src --
-state.list.map(num, string(num))
-
--- out --
+```json
 [
 	"1",
 	"2",
@@ -351,14 +372,15 @@ state.list.map(num, string(num))
 
 #### Convert a list of strings to uppercase
 
+```shell
+mito -data <(echo '{
+  "list": ["abc", "cde"]
+}') <(echo '
+  state.list.map(e, e.to_upper())
+')
 ```
--- data --
-{ "list": ["abc", "cde"] }
 
--- src --
-state.list.map(e, e.to_upper())
-
--- out --
+```json
 [
 	"ABC",
 	"CDE"
@@ -370,77 +392,111 @@ state.list.map(e, e.to_upper())
 When output in a `state` object, keys in maps must be strings. Used as a
 temporary object, the keys can be numbers.
 
+This command creates a map with string keys:
+
+```shell
+mito -data <(echo '{
+  "list": [1,2,3],
+  "number": 3
+}') <(echo '
+  state.list.map(num, string(num)).as(str_num, zip(str_num, state.list))
+')
 ```
--- data --
-{ "list": [1,2,3], "number": 3}
 
--- src --
-state.list.map(num, string(num)).as(str_num, zip(str_num, state.list))
-
--- out --
+```json
 {
 	"1": 1,
 	"2": 2,
 	"3": 3
 }
+```
 
--- src --
-zip(state.list, state.list)[state.number]
+A temporary map can use number keys:
 
--- out --
+```shell
+mito -data <(echo '{
+  "list": [1,2,3],
+  "number": 3
+}') <(echo '
+  zip(state.list, state.list)[state.number]
+')
+```
+
+```json
 3
+```
 
--- src --
-zip(state.list, state.list)
+Returning that map directly fails because output map keys must be strings:
 
--- out --
+```shell
+mito -data <(echo '{
+  "list": [1,2,3],
+  "number": 3
+}') <(echo '
+  zip(state.list, state.list)
+')
+```
+
+```text
 failed proto conversion: type conversion error from Double to 'string'
 ```
 
-#### Turn an array of objects with maps into one map
+#### Merge an array of maps into a single map
 
+```shell
+mito -data <(echo '[
+  {
+    "abcdef": {
+      "key1": "value1",
+      "key2": "value2"
+    },
+    "mnopqrs": {
+      "key1": "value5",
+      "key2": "value6"
+    }
+  },
+  {
+    "ghijkl": {
+      "key3": "value3",
+      "key4": "value4"
+    }
+  },
+  {
+    "xyz": {
+      "key7": "value7"
+    }
+  }
+]') <(echo '
+  state.map(e,
+    e.keys().map(k, {
+      "key": k,
+      "value": e[k],
+    })
+  ).flatten().as(entries,
+    zip(
+      entries.map(entry, entry.key),
+      entries.map(entry, entry.value)
+    )
+  )
+')
 ```
--- data --
-[
-	{
-		"abcdef": {
-		"key1": "value1",
-		"key2": "value2"
-	},
-		"mnopqrs": {
-			"key1": "value5",
-			"key2": "value6"
-		}
-	},
-	{
-		"ghijkl": {
-			"key3": "value3",
-			"key4": "value4"
-		}
-	}
-]
 
--- src --
-zip(
-	state.map(e,e.map(key,key)).flatten(),
-	state.map(e,
-		e.map(key, e[key])
-	).flatten()
-)
-
--- output --
+```json
 {
 	"abcdef": {
-		"key1": "value5",
-		"key2": "value6"
+		"key1": "value1",
+		"key2": "value2"
 	},
 	"ghijkl": {
 		"key3": "value3",
 		"key4": "value4"
 	},
 	"mnopqrs": {
-		"key1": "value1",
-		"key2": "value2"
+		"key1": "value5",
+		"key2": "value6"
+	},
+	"xyz": {
+		"key7": "value7"
 	}
 }
 ```
@@ -449,34 +505,49 @@ zip(
 
 #### Check whether a map contains a key
 
-```
--- data --
-{
+The key from `state.five` is not present:
+
+```shell
+mito -data <(echo '{
   "list_map": {
-	"10": 10,
-	"2": 2,
-	"9": 9
-	},
-	"nine" : "9",
-	"five" : "5"
-}
+    "10": 10,
+    "2": 2,
+    "9": 9
+  },
+  "nine" : "9",
+  "five" : "5"
+}') <(echo '
+  try(state.list_map[state.five], "map_has_no_key_error").as(
+    value,
+    !has(value.map_has_no_key_error)
+  )
+')
+```
 
--- src --
-try(state.list_map[state.five], "map_has_no_key_error").as(
-   value,
-   !has(value.map_has_no_key_error)
-)
-
--- out --
+```json
 false
+```
 
--- src --
-try(state.list_map[state.nine], "map_has_no_key_error").as(
-	value,
-	!has(value.map_has_no_key_error)
-)
+The key from `state.nine` is present:
 
--- out --
+```shell
+mito -data <(echo '{
+  "list_map": {
+    "10": 10,
+    "2": 2,
+    "9": 9
+  },
+  "nine" : "9",
+  "five" : "5"
+}') <(echo '
+  try(state.list_map[state.nine], "map_has_no_key_error").as(
+    value,
+    !has(value.map_has_no_key_error)
+  )
+')
+```
+
+```json
 true
 ```
 
@@ -484,18 +555,17 @@ true
 
 Convert the list to a map, then use `try` to check for the key.
 
+```shell
+mito -data <(echo '{
+  "list": [1,2,3],
+  "number": 3
+}') <(echo '
+  try(zip(state.list, state.list)[state.number], "has_no_such_key_error")
+    .as(value, !has(value.has_no_such_key_error))
+')
 ```
--- data --
-{
-	"list": [1,2,3],
-	"number": 3
-}
 
--- src --
-try(zip(state.list, state.list)[state.number], "has_no_such_key_error")
-.as(value, !has(value.has_no_such_key_error))
-
--- out --
+```json
 true
 ```
 
@@ -506,16 +576,35 @@ true
 Zip the list with itself to produce a map where the key and value are the same
 value in a list, then take the keys.
 
+Either form returns the same sorted, deduplicated list:
+
+```shell
+mito -data <(echo '{
+  "list": [9,10,1,5,3,9,10]
+}') <(echo '
+  zip(state.list, state.list).keys()
+')
 ```
--- data --
-{ "list": [9,10,1,5,3, 9, 10] }
 
--- src --
-zip(state.list, state.list).keys()
-or
-state.list.zip(state.list).keys()
+```json
+[
+	1,
+	3,
+	5,
+	9,
+	10
+]
+```
 
--- out --
+```shell
+mito -data <(echo '{
+  "list": [9,10,1,5,3,9,10]
+}') <(echo '
+  state.list.zip(state.list).keys()
+')
+```
+
+```json
 [
 	1,
 	3,
@@ -530,15 +619,17 @@ state.list.zip(state.list).keys()
 This is a set complement operation for two unordered, unsorted, non-unique
 lists.
 
+```shell
+mito -data <(echo '{
+  "list1": [9,10,2],
+  "list2": [4,8,2,7,4]
+}') <(echo '
+  zip(state.list1, state.list1).as(existing,
+    zip(state.list2, state.list2).keys().filter(x, try(existing[x], "error").as(value, has(value.error))))
+')
 ```
--- data --
-{ "list1": [9,10,2] , "list2" : [4,8,2,7,4] }
 
--- src --
-zip(state.list1, state.list1).as(existing,
-  zip(state.list2, state.list2).keys().filter(x, try(existing[x], "error").as(value, has(value.error))))
-
--- out --
+```json
 [
 	4,
 	7,
@@ -551,15 +642,17 @@ zip(state.list1, state.list1).as(existing,
 This is a set intersection operation for two unordered, unsorted, non-unique
 lists.
 
+```shell
+mito -data <(echo '{
+  "list1": [9,10,2],
+  "list2": [4,8,2,7,4]
+}') <(echo '
+  zip(state.list1, state.list1).as(existing,
+    zip(state.list2, state.list2).keys().filter(x, try(existing[x], "error").as(value, !has(value.error))))
+')
 ```
--- data --
-{ "list1": [9,10,2] , "list2" : [4,8,2,7,4] }
 
--- src --
-zip(state.list1, state.list1).as(existing,
-	zip(state.list2, state.list2).keys().filter(x, try(existing[x], "error").as(value, !has(value.error))))
-
--- out --
+```json
 [
 	2
 ]
@@ -569,14 +662,16 @@ zip(state.list1, state.list1).as(existing,
 
 This concatenates two lists. It does not deduplicate or sort the result.
 
+```shell
+mito -data <(echo '{
+  "list1": [9,10,2],
+  "list2": [4,8,7]
+}') <(echo '
+  (state.list1 + state.list2)
+')
 ```
--- data --
-{ "list1": [9,10,2] , "list2" : [4,8,7] }
 
--- src --
-(state.list1 + state.list2)
-
--- out --
+```json
 [
 	9,
 	10,
@@ -591,14 +686,16 @@ This concatenates two lists. It does not deduplicate or sort the result.
 
 This creates a sorted, deduplicated union.
 
+```shell
+mito -data <(echo '{
+  "list1": [9,10,2],
+  "list2": [4,8,7]
+}') <(echo '
+  (state.list1 + state.list2).as(union, zip(union, union).keys())
+')
 ```
--- data --
-{ "list1": [9,10,2] , "list2" : [4,8,7] }
 
--- src --
-(state.list1 + state.list2).as(union, zip(union, union).keys())
-
--- out --
+```json
 [
 	2,
 	4,
@@ -611,29 +708,60 @@ This creates a sorted, deduplicated union.
 
 #### Determine whether a value is between two other values
 
+This command checks `state.target1`:
+
+```shell
+mito -data <(echo '{
+  "v1": 2,
+  "v2": 4,
+  "target1": 3,
+  "target2": 5,
+  "targets": [3,5]
+}') <(echo '
+  [state.v1, state.v2].as(values, zip(values, values).keys())
+    .as(ordered_values, state.target1 > ordered_values[0] && state.target1 < ordered_values[1])
+')
 ```
--- data --
-{ "v1": 2, "v2": 4, "target1" : 3, "target2" : 5, "targets": [3,5] }
 
--- src --
-[state.v1, state.v2].as(values, zip(values, values).keys())
-	.as(ordered_values, state.target1 > ordered_values[0] && state.target1 < ordered_values[1])
-
--- out --
+```json
 true
+```
 
--- src --
-[state.v1, state.v2].as(values, zip(values, values).keys())
-	.as(ordered_values, state.target2 > ordered_values[0] && state.target2 < ordered_values[1])
+This command checks `state.target2`:
 
--- out --
+```shell
+mito -data <(echo '{
+  "v1": 2,
+  "v2": 4,
+  "target1": 3,
+  "target2": 5,
+  "targets": [3,5]
+}') <(echo '
+  [state.v1, state.v2].as(values, zip(values, values).keys())
+    .as(ordered_values, state.target2 > ordered_values[0] && state.target2 < ordered_values[1])
+')
+```
+
+```json
 false
+```
 
--- src --
-[state.v1, state.v2].as(values, zip(values, values).keys())
-	.as(ordered_values, state.targets.map(x, x > ordered_values[0] && x < ordered_values[1]))
+This command checks each value in `state.targets`:
 
--- out --
+```shell
+mito -data <(echo '{
+  "v1": 2,
+  "v2": 4,
+  "target1": 3,
+  "target2": 5,
+  "targets": [3,5]
+}') <(echo '
+  [state.v1, state.v2].as(values, zip(values, values).keys())
+    .as(ordered_values, state.targets.map(x, x > ordered_values[0] && x < ordered_values[1]))
+')
+```
+
+```json
 [
 	true,
 	false
