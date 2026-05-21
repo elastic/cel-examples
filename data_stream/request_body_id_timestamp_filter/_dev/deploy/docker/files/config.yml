@@ -1,4 +1,5 @@
 rules:
+
   - path: /test/api/booking/history
     methods: [POST]
     query_params:
@@ -28,6 +29,7 @@ rules:
           "lastId": "ab75ff48-ab45-4bb5-9d02-88745177dedb"
           }`
           }}
+
   - path: /test/api/booking/history
     methods: [POST]
     query_params:
@@ -57,6 +59,7 @@ rules:
 
           }`
           }}
+
   - path: /test/api/booking/history
     methods: [POST]
     query_params:

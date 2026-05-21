@@ -4,7 +4,9 @@
 #   /list-error
 #   /fetch-error
 rules:
+
   # success scenario
+
   - path: /success/v0/message-groups
     methods: ['GET']
     query_params:
@@ -41,6 +43,7 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
+
   - path: /success/v0/message-groups
     methods: ['GET']
     query_params:
@@ -77,6 +80,7 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
+
   - path: /success/v0/message-groups
     methods: ['GET']
     query_params:
@@ -102,6 +106,7 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
+
   - path: /success/v0/messages/9c426680-5cdf-4283-adbd-d79ba0e52434
     methods: ['GET']
     request_headers:
@@ -151,6 +156,7 @@ rules:
             ]
           }
           `}}
+
   - path: /success/v0/messages/26bf7e5c-4b46-4042-90de-eacb22dc1b3d
     methods: ['GET']
     request_headers:
@@ -200,6 +206,7 @@ rules:
             ]
           }
           `}}
+
   - path: /success/v0/messages/12345678-5cdf-4283-adbd-d79ba0e52411
     methods: ['GET']
     request_headers:
@@ -249,6 +256,7 @@ rules:
             ]
           }
           `}}
+
   - path: /success/v0/messages/87654321-4b46-4042-90de-eacb22dc1b22
     methods: ['GET']
     request_headers:
@@ -298,7 +306,9 @@ rules:
             ]
           }
           `}}
+
   # list group messages error scenario
+
   - path: /list-error/v0/message-groups
     methods: ['GET']
     query_params:
@@ -321,6 +331,7 @@ rules:
             "error": {"message" : "server error"}
           }
           `}}
+
   - path: /list-error/v0/message-groups
     methods: ['GET']
     query_params:
@@ -343,6 +354,7 @@ rules:
             "error": {"message" : "server error"}
           }
           `}}
+
   - path: /list-error/v0/message-groups
     methods: ['GET']
     query_params:
@@ -368,6 +380,7 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
+
   - path: /list-error/v0/messages/9c426680-5cdf-4283-adbd-d79ba0e52434
     methods: ['GET']
     request_headers:
@@ -417,6 +430,7 @@ rules:
             ]
           }
           `}}
+
   - path: /list-error/v0/messages/26bf7e5c-4b46-4042-90de-eacb22dc1b3d
     methods: ['GET']
     request_headers:
@@ -466,6 +480,7 @@ rules:
             ]
           }
           `}}
+
   - path: /list-error/v0/messages/12345678-5cdf-4283-adbd-d79ba0e52411
     methods: ['GET']
     request_headers:
@@ -515,6 +530,7 @@ rules:
             ]
           }
           `}}
+
   - path: /list-error/v0/messages/87654321-4b46-4042-90de-eacb22dc1b22
     methods: ['GET']
     request_headers:
@@ -564,7 +580,9 @@ rules:
             ]
           }
           `}}
+
   # fetch message error scenario
+
   - path: /fetch-error/v0/message-groups
     methods: ['GET']
     query_params:
@@ -601,6 +619,7 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
+
   - path: /fetch-error/v0/message-groups
     methods: ['GET']
     query_params:
@@ -637,6 +656,7 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
+
   - path: /fetch-error/v0/message-groups
     methods: ['GET']
     query_params:
@@ -662,6 +682,7 @@ rules:
             "stats_limit_exceeded": false
           }
           `}}
+
   - path: /fetch-error/v0/messages/9c426680-5cdf-4283-adbd-d79ba0e52434
     methods: ['GET']
     request_headers:
@@ -711,6 +732,7 @@ rules:
             ]
           }
           `}}
+
   - path: /fetch-error/v0/messages/26bf7e5c-4b46-4042-90de-eacb22dc1b3d
     methods: ['GET']
     request_headers:
@@ -760,6 +782,7 @@ rules:
             ]
           }
           `}}
+
   - path: /fetch-error/v0/messages/12345678-5cdf-4283-adbd-d79ba0e52411
     methods: ['GET']
     request_headers:
@@ -776,6 +799,7 @@ rules:
             "error": {"message" : "server error"}
           }
           `}}
+
   - path: /fetch-error/v0/messages/87654321-4b46-4042-90de-eacb22dc1b22
     methods: ['GET']
     request_headers:

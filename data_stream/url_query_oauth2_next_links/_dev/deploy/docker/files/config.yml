@@ -1,4 +1,5 @@
 rules:
+
   - path: /testoauth/token
     methods: [POST]
     query_params:
@@ -15,6 +16,7 @@ rules:
             - "application/json"
         body: |-
           {"access_token": "testaccess","token_type": "Bearer","expires_in": 172799,"refresh_token": "testrefresh"}
+
   - path: /test/api/booking
     methods: [GET]
     query_params:
@@ -45,6 +47,7 @@ rules:
             }
           }`
           }}
+
   - path: /test/api/booking
     methods: [GET]
     query_params:
@@ -76,6 +79,7 @@ rules:
             }
           }`
           }}
+
   - path: /test/api/booking
     methods: [GET]
     query_params:
@@ -106,6 +110,7 @@ rules:
             }
           }`
           }}
+
   - path: /test/api/booking
     methods: [GET]
     query_params:
