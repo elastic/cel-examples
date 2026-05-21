@@ -252,13 +252,13 @@ correct tag for the Beats repository.
 The use of `null` requires this syntax:
 
 ```
-state.?value && state.value != null
+has(state.value) && state.value != null
 ```
 
 Using `optional.none()` requires only this syntax:
 
 ```
-state.?value
+state.?value.hasValue()
 ```
 
 Using `optional.none()` removes the value entirely, removing the requirement to
