@@ -1,5 +1,9 @@
 # Exercise the CEL program's error handling when a message fetch returns HTTP 500 after worklist setup.
 
+# Normally we would use testscript commands instead of embedding a shell script.
+# Bash is used here to replicate a manual testing workflow more directly, since
+# this integration is a purely pedagogical demonstration of CEL patterns.
+
 [!exec:bash] skip 'bash is required'
 [!exec:celfmt] skip 'celfmt is required'
 [!exec:mito] skip 'mito is required'
