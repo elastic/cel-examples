@@ -1,0 +1,20 @@
+{
+    "expected": [
+        {
+            "url_query_noauth_page_number": {
+                "id": "ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id": "ab67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name": "John Apple"
+            },
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "original": "{\"id\":\"ab5af2c-f477-43c4-8bdf-a00bdb939d65\",\"trip_id\":\"ab67459c-af07-40bb-bb12-178dbb88e09f\",\"passenger_name\":\"John Apple\"}"
+            },
+            "tags": [
+                "preserve_original_event"
+            ]
+        }
+    ]
+}

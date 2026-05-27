@@ -1,0 +1,6 @@
+# newer versions go on top
+- version: 0.1.0
+  changes:
+    - description: Integration package for CEL examples.
+      type: enhancement
+      link: https://github.com/elastic/cel-examples/pull/1

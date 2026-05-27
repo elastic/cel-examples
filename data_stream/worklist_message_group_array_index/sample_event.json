@@ -1,0 +1,34 @@
+{
+    "@timestamp": "2024-07-12T05:15:08.221838Z",
+    "data_stream": {
+        "dataset": "cel_examples.worklist_message_group_array_index",
+        "namespace": "default",
+        "type": "logs"
+    },
+    "ecs": {
+        "version": "9.3.0"
+    },
+    "event": {
+        "dataset": "cel_examples.worklist_message_group_array_index",
+        "kind": "event",
+        "module": "cel_examples",
+        "type": [
+            "info"
+        ]
+    },
+    "input": {
+        "type": "cel"
+    },
+    "tags": [
+        "preserve_original_event",
+        "forwarded",
+        "cel_examples-worklist_message_group_array_index"
+    ],
+    "worklist_message_group_array_index": {
+        "id": "9c426680-5cdf-4283-adbd-d79ba0e52434",
+        "subject": "Urgent: Wire transfer",
+        "sender": {
+            "email": "bob.demo@gmail.com"
+        }
+    }
+}

@@ -1,0 +1,3 @@
+- name: url_query_basic_auth_manual_next_link
+  type: flattened
+  description: Parsed API response object collected by the URL Query Basic Auth Manual Next Link example stream.

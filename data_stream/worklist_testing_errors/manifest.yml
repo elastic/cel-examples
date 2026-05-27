@@ -1,0 +1,82 @@
+title: Worklist Testing Errors
+type: logs
+streams:
+  - input: cel
+    title: Worklist Testing Errors
+    description: Collect messages through a worklist while demonstrating cleanup after failed phases.
+    template_path: cel.yml.hbs
+    vars:
+      - name: url
+        type: url
+        title: URL
+        description: Base URL for the example API.
+        required: true
+        show_user: true
+        multi: false
+        default: http://localhost:8090/success
+      - name: interval
+        type: text
+        title: Interval
+        description: Duration between requests to the API.
+        required: true
+        show_user: true
+        multi: false
+        default: 1m
+      - name: page_size
+        type: integer
+        title: Page Size
+        description: Number of message groups to request per page.
+        required: true
+        show_user: false
+        multi: false
+        default: 1
+      - name: initial_interval
+        type: text
+        title: Initial Interval
+        description: How far back to query on first run.
+        required: true
+        show_user: true
+        multi: false
+        default: 24h
+      - name: api_key
+        type: password
+        title: API Key
+        description: Bearer token for the mock API.
+        required: true
+        show_user: true
+        secret: true
+        multi: false
+        default: xxxx
+      - name: enable_request_tracer
+        type: bool
+        title: Enable request tracing
+        description: The request tracer logs requests and responses to the agent's local file-system for debugging.
+        required: false
+        show_user: false
+        multi: false
+        default: false
+      - name: preserve_original_event
+        type: bool
+        title: Preserve original event
+        description: Preserves a raw copy of the original event in event.original.
+        required: false
+        show_user: true
+        multi: false
+        default: false
+      - name: tags
+        type: text
+        title: Tags
+        description: Tags for the data stream.
+        required: false
+        show_user: false
+        multi: true
+        default:
+          - forwarded
+          - cel_examples-worklist_testing_errors
+      - name: processors
+        type: yaml
+        title: Processors
+        description: Processors to apply before ingest pipelines.
+        required: false
+        show_user: false
+        multi: false

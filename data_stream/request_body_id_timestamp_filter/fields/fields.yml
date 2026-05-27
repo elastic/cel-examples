@@ -1,0 +1,3 @@
+- name: request_body_id_timestamp_filter
+  type: flattened
+  description: Parsed API response object collected by the Id Timestamp Filter example stream.

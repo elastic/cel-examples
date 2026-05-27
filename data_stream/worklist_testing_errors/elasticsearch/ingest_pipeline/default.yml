@@ -1,0 +1,44 @@
+---
+description: Pipeline for processing Worklist Testing Errors logs.
+processors:
+  - set:
+      tag: set_ecs_version
+      field: ecs.version
+      value: 9.3.0
+  - terminate:
+      tag: data_collection_error
+      if: ctx.error?.message != null && ctx.message == null && ctx.event?.original == null
+  - rename:
+      tag: rename_message_to_event_original
+      if: ctx.event?.original == null
+      field: message
+      target_field: event.original
+      ignore_missing: true
+  - remove:
+      tag: remove_message
+      if: ctx.event?.original != null
+      field: message
+      ignore_missing: true
+  - json:
+      tag: json_event_original
+      if: ctx.event?.original instanceof String && ctx.event.original.trim().startsWith('{')
+      field: event.original
+      target_field: worklist_testing_errors
+      ignore_failure: true
+on_failure:
+  - set:
+      tag: set_pipeline_error_kind
+      field: event.kind
+      value: pipeline_error
+  - append:
+      tag: append_preserve_original_event_tag
+      field: tags
+      value: preserve_original_event
+      allow_duplicates: false
+  - append:
+      tag: append_pipeline_error_message
+      field: error.message
+      value: >-
+        Processor '{{{ _ingest.on_failure_processor_type }}}'
+        {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}'
+        {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'

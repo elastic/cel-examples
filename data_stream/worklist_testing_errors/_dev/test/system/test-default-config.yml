@@ -1,0 +1,15 @@
+input: cel
+service: worklist_testing_errors
+vars: ~
+data_stream:
+  vars:
+    url: "http://{{Hostname}}:{{Port}}/success"
+    enable_request_tracer: true
+    page_size: 1
+    initial_interval: 24h
+    api_key: xxxx
+    preserve_original_event: true
+assert:
+  hit_count: 4
+  fields_present:
+    - worklist_testing_errors

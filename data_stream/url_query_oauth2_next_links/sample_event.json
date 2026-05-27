@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2024-07-12T05:15:08.221838Z",
+    "data_stream": {
+        "dataset": "cel_examples.url_query_oauth2_next_links",
+        "namespace": "default",
+        "type": "logs"
+    },
+    "ecs": {
+        "version": "9.3.0"
+    },
+    "event": {
+        "dataset": "cel_examples.url_query_oauth2_next_links",
+        "kind": "event",
+        "module": "cel_examples",
+        "type": [
+            "info"
+        ]
+    },
+    "input": {
+        "type": "cel"
+    },
+    "tags": [
+        "preserve_original_event",
+        "forwarded",
+        "cel_examples-url_query_oauth2_next_links"
+    ],
+    "url_query_oauth2_next_links": {
+        "id": "ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+        "trip_id": "ab67459c-af07-40bb-bb12-178dbb88e09f",
+        "passenger_name": "John Apple"
+    }
+}
