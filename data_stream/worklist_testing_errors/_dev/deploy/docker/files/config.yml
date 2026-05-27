@@ -306,7 +306,6 @@ rules:
             ]
           }
           `}}
-
   # list group messages error scenario
 
   - path: /list-error/v0/message-groups
@@ -328,7 +327,9 @@ rules:
         body: |-
           {{ minify_json `
           {
-            "error": {"message" : "server error"}
+            "error": {
+              "message": "server error"
+            }
           }
           `}}
 
@@ -351,7 +352,9 @@ rules:
         body: |-
           {{ minify_json `
           {
-            "error": {"message" : "server error"}
+            "error": {
+              "message": "server error"
+            }
           }
           `}}
 
@@ -580,7 +583,6 @@ rules:
             ]
           }
           `}}
-
   # fetch message error scenario
 
   - path: /fetch-error/v0/message-groups
@@ -796,7 +798,9 @@ rules:
         body: |-
           {{ minify_json `
           {
-            "error": {"message" : "server error"}
+            "error": {
+              "message": "server error"
+            }
           }
           `}}
 

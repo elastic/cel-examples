@@ -12,24 +12,24 @@ rules:
         body: |-
           {{ minify_json `
           {
-            "data":[
+            "data": [
               {
-                "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
-                "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
-                "passenger_name":"John Apple"
+                "id": "ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id": "ab67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name": "John Apple"
               },
               {
-                "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
-                "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
-                "passenger_name":"Jane Artichoke"
+                "id": "ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id": "ab123456-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name": "Jane Artichoke"
               }
             ],
-           "links":{
-              "self":"/booking?page=1",
-              "next":"/booking?page=2"
+            "links": {
+              "self": "/booking?page=1",
+              "next": "/booking?page=2"
             }
-          }`
-          }}
+          }
+          `}}
 
   - path: /test/api/booking
     methods: [GET]
@@ -43,25 +43,25 @@ rules:
         body: |-
           {{ minify_json `
           {
-            "data":[
+            "data": [
               {
-                "id":"cd5af2c-f477-43c4-8bdf-a00bdb939d65",
-                "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
-                "passenger_name":"George Doe"
+                "id": "cd5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id": "cd67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name": "George Doe"
               },
               {
-                "id":"cd25ff48-ab45-4bb5-9d02-88745177dedb",
-                "trip_id":"cd67459c-af07-40bb-bb12-178dbb88e09f",
-                "passenger_name":"Joan Doe"
+                "id": "cd25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id": "cd67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name": "Joan Doe"
               }
             ],
-            "links":{
-              "previous":"/booking?page=1",
-              "self":"/booking?page=2",
-              "next":"/booking?page=3"
+            "links": {
+              "previous": "/booking?page=1",
+              "self": "/booking?page=2",
+              "next": "/booking?page=3"
             }
-          }`
-          }}
+          }
+          `}}
 
   - path: /test/api/booking
     methods: [GET]
@@ -75,24 +75,24 @@ rules:
         body: |-
           {{ minify_json `
           {
-            "data":[
+            "data": [
               {
-                "id":"ef5af2c-f477-43c4-8bdf-a00bdb939d65",
-                "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
-                "passenger_name":"James Effort"
+                "id": "ef5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id": "ef67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name": "James Effort"
               },
               {
-                "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
-                "trip_id":"ef67459c-af07-40bb-bb12-178dbb88e09f",
-                "passenger_name":"Jenny Ergo"
+                "id": "ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id": "ef67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name": "Jenny Ergo"
               }
             ],
-            "links":{
-              "previous":"/booking?page=2",
-              "self":"/booking?page=3"
+            "links": {
+              "previous": "/booking?page=2",
+              "self": "/booking?page=3"
             }
-          }`
-          }}
+          }
+          `}}
 
   - path: /test/api/booking
     methods: [GET]
@@ -105,21 +105,21 @@ rules:
         body: |-
           {{ minify_json `
           {
-            "data":[
+            "data": [
               {
-                "id":"ab5af2c-f477-43c4-8bdf-a00bdb939d65",
-                "trip_id":"ab67459c-af07-40bb-bb12-178dbb88e09f",
-                "passenger_name":"John Apple"
+                "id": "ab5af2c-f477-43c4-8bdf-a00bdb939d65",
+                "trip_id": "ab67459c-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name": "John Apple"
               },
               {
-                "id":"ef25ff48-ab45-4bb5-9d02-88745177dedb",
-                "trip_id":"ab123456-af07-40bb-bb12-178dbb88e09f",
-                "passenger_name":"Jane Artichoke"
+                "id": "ef25ff48-ab45-4bb5-9d02-88745177dedb",
+                "trip_id": "ab123456-af07-40bb-bb12-178dbb88e09f",
+                "passenger_name": "Jane Artichoke"
               }
             ],
-            "links":{
-              "self":"/booking?page=1",
-              "next":"/booking?page=2"
+            "links": {
+              "self": "/booking?page=1",
+              "next": "/booking?page=2"
             }
-          }`
-          }}
+          }
+          `}}
